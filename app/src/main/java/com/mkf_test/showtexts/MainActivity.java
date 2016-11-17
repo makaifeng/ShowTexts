@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.ViewInject;
@@ -39,7 +38,6 @@ public class MainActivity extends BaseActivity {
         startActivityForResult(new Intent(this,WebActivity.class).putExtra("url",url),1);
     }
     public void showLastUrl(View v){
-        Toast.makeText(this,"",Toast.LENGTH_LONG).show();
         startActivityForResult(new Intent(this,WebActivity.class).putExtra("url",lastUrl),1);
 
     }

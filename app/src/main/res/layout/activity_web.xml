@@ -3,10 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <com.mkf_test.showtexts.ProgressWebView
-        android:id="@+id/webview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        >
-    </com.mkf_test.showtexts.ProgressWebView>
+        <com.mkf_test.showtexts.ProgressWebView
+            android:id="@+id/webview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+        </com.mkf_test.showtexts.ProgressWebView>
+
 </LinearLayout>

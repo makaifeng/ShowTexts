@@ -12,8 +12,8 @@ import android.graphics.BitmapFactory.Options;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
-import android.view.Window;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -22,6 +22,7 @@ import android.webkit.WebViewClient;
 
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.ViewInject;
+import org.xutils.x;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,7 +30,7 @@ import java.io.FileOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 @ContentView(R.layout.activity_web)
-public class WebActivity extends BaseActivity {
+public class WebActivity extends AppCompatActivity {
     @ViewInject(R.id.webview)
 	private WebView webview;
 	private String urlPath;
@@ -40,8 +41,8 @@ public class WebActivity extends BaseActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+        x.view().inject(this);
         try {
 			getIntentData();
 			initView();
@@ -82,7 +83,11 @@ public class WebActivity extends BaseActivity {
 
 
 		WebSettings webSettings = webview.getSettings();
-		// 设置WebView属性，能够执行Javascript脚本
+        //设置 缓存模式
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        // 开启 DOM storage API 功能
+        webSettings.setDomStorageEnabled(true);
+        // 设置WebView属性，能够执行Javascript脚本
 //		webSettings.setJavaScriptEnabled(true);
 		 // 设置可以访问文件
 //		 webSettings.setAllowFileAccess(true);
@@ -93,6 +98,7 @@ public class WebActivity extends BaseActivity {
 		webview.loadUrl(urlPath);
 		// 设置Web视图
 		webview.setWebViewClient(new webViewClient());
+
 		setWebChromeClient();
 		// if (android.os.Build.VERSION.SDK_INT >
 		// android.os.Build.VERSION_CODES.JELLY_BEAN) {
@@ -116,7 +122,14 @@ public class WebActivity extends BaseActivity {
 
 	// Web视图
 	private class webViewClient extends WebViewClient {
-		public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//        @Override
+//        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+//            view.loadUrl( request.getUrl().toString());
+//            return true;
+//        }
+
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+
 			view.loadUrl(url);
 			return true;
 		}
@@ -143,12 +156,50 @@ public class WebActivity extends BaseActivity {
 
 		@Override
 		public void onPageFinished(WebView view, String url) {
-			// if (!url.startsWith("ttm")) {
-			// tv_head_title.setText(view.getTitle());
-			// }
+            setTitle(view.getTitle());
 			super.onPageFinished(view, url);
 		}
-	}
+
+//        @Override
+//        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+//               try {
+            //        if (url.endsWith("icon.png")) {
+            //            InputStream is = appRm.getInputStream(R.drawable.icon);
+            //            WebResourceResponse response = new WebResourceResponse("image/png",
+            //                    "utf-8", is);
+            //            return response;
+            //        } else if (url.endsWith("jquery.min.js")) {
+            //            InputStream is = appRm.getInputStream(R.raw.jquery_min_js);
+            //            WebResourceResponse response = new WebResourceResponse("text/javascript",
+            //                    "utf-8", is);
+            //            return response;
+            //        }
+            //    } catch (IOException e) {
+            //        e.printStackTrace();
+            //    }
+            //    return super.shouldInterceptRequest(view, url);
+//        }
+
+//        @Override
+//        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+//            try {
+//                if (request.getUrl().toString().endsWith("icon.png")) {
+//                    InputStream is = appRm.getInputStream(R.drawable.icon);
+//                    WebResourceResponse response = new WebResourceResponse("image/png",
+//                            "utf-8", is);
+//                    return response;
+//                } else if (request.getUrl().toString().endsWith("jquery.min.js")) {
+//                    InputStream is = appRm.getInputStream(R.raw.jquery_min_js);
+//                    WebResourceResponse response = new WebResourceResponse("text/javascript",
+//                            "utf-8", is);
+//                    return response;
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            return super.shouldInterceptRequest(view, request);
+//        }
+    }
 	@Override
 	protected void onPause() {
         webview.onResume();
@@ -222,21 +273,23 @@ public class WebActivity extends BaseActivity {
             {  
                 ContentResolver resolver = this.getContentResolver();  
                 String[] columns = { MediaStore.Images.Media.DATA };  
-                Cursor cursor = resolver.query(result, columns, null, null, null);  
-                cursor.moveToFirst();  
-                int columnIndex = cursor.getColumnIndex(columns[0]);  
-                String imgPath = cursor.getString(columnIndex);  
-                System.out.println("imgPath = " + imgPath);  
-                if (null == imgPath)  
-                {  
-                    return;  
-                }  
-                File file = new File(imgPath);  
-                   //将图片处理成大小符合要求的文件  
-                result = Uri.fromFile(handleFile(file));  
-                mUploadFile.onReceiveValue(result);  
-                mUploadFile = null;       
-            }  
+                Cursor cursor = resolver.query(result, columns, null, null, null);
+                if (cursor!=null) {
+                    cursor.moveToFirst();
+                    int columnIndex = cursor.getColumnIndex(columns[0]);
+                    String imgPath = cursor.getString(columnIndex);
+                    System.out.println("imgPath = " + imgPath);
+                    if (null == imgPath) {
+                        return;
+                    }
+                    File file = new File(imgPath);
+                    //将图片处理成大小符合要求的文件
+                    result = Uri.fromFile(handleFile(file));
+                    mUploadFile.onReceiveValue(result);
+                    mUploadFile = null;
+                    cursor.close();
+                }
+            }
         }  
         super.onActivityResult(requestCode, resultCode, data);  
     }  
@@ -312,7 +365,7 @@ public class WebActivity extends BaseActivity {
         if(isUpdate){
             return;
         }
-        getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putString("url",webview.getUrl()).commit();
+        getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putString("url",webview.getUrl()).apply();
         isUpdate=true;
 
     }
