@@ -3,6 +3,7 @@
     package="com.mkf_test.showtexts">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
     <application
         android:allowBackup="true"
         android:name=".MyApplication"
@@ -19,6 +20,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".WebActivity">
+        </activity>
+        <activity android:name=".ListActivity">
         </activity>
     </application>
 
