@@ -9,29 +9,30 @@ import android.widget.EditText;
 
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.ViewInject;
-import org.xutils.x;
 
 @ContentView(R.layout.activity_main)
-public class MainActivity extends BaseActivity {
-    @ViewInject(R.id.editText)
-    private EditText edittext;
-    @ViewInject(R.id.button2)
+    public class MainActivity extends BaseActivity {
+        @ViewInject(R.id.editText)
+        private EditText edittext;
+        @ViewInject(R.id.button2)
     private Button showLastUrl;
     String lastUrl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        x.view().inject(this);
 //        setContentView(R.layout.activity_main);
 //        String url="http://m.biquge.com/13_13453/7436940.html";
 //        String url="http://m.greattone.net/app/music.php?classid=13&id=666";
-//        String url="http://www.greattone.net/test/demo.html";
-//        edittext.setText(url);
+        String url="http://www.greattone.net/news/yinyue/2016-11-16/26071.html";
+        edittext.setText(url);
         lastUrl=getSharedPreferences(getPackageName(),MODE_PRIVATE).getString("url","");
         if(!TextUtils.isEmpty(lastUrl)){
             showLastUrl.setVisibility(View.VISIBLE);
         }
+//        setSupportActionBar(toolbar);
     }
+
+
     public void toWeb(View v){
         String url=edittext.getText().toString().trim();
         if (TextUtils.isEmpty(url)) return;
@@ -40,6 +41,9 @@ public class MainActivity extends BaseActivity {
     public void showLastUrl(View v){
         startActivityForResult(new Intent(this,WebActivity.class).putExtra("url",lastUrl),1);
 
+    }
+    public void viewBookMarks(View v){
+        startActivityForResult(new Intent(this,ListActivity.class),2);
     }
 
     @Override
@@ -51,9 +55,14 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-            lastUrl=getSharedPreferences(getPackageName(),MODE_PRIVATE).getString("url","");
-            if(!TextUtils.isEmpty(lastUrl)){
+        if (requestCode==RESULT_OK&&resultCode==1) {
+            lastUrl = getSharedPreferences(getPackageName(), MODE_PRIVATE).getString("url", "");
+            if (!TextUtils.isEmpty(lastUrl)) {
                 showLastUrl.setVisibility(View.VISIBLE);
             }
+        }else if (requestCode==RESULT_OK&&resultCode==2){
+            String url=data.getStringExtra("url");
+            startActivityForResult(new Intent(this,WebActivity.class).putExtra("url",url),1);
+        }
     }
 }

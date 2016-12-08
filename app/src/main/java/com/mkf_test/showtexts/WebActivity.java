@@ -11,15 +11,24 @@ import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.webkit.DownloadListener;
 import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
+import com.mkf_test.showtexts.utils.Dbutils;
+import com.mkf_test.showtexts.widget.ProgressWebView;
+
+import org.xutils.ex.DbException;
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.ViewInject;
 import org.xutils.x;
@@ -29,10 +38,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 @ContentView(R.layout.activity_web)
 public class WebActivity extends AppCompatActivity {
     @ViewInject(R.id.webview)
-	private WebView webview;
+	private ProgressWebView webview;
 	private String urlPath;
 	private int orientation;
 	
@@ -87,19 +97,19 @@ public class WebActivity extends AppCompatActivity {
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         // 开启 DOM storage API 功能
         webSettings.setDomStorageEnabled(true);
-        // 设置WebView属性，能够执行Javascript脚本
+//        // 设置WebView属性，能够执行Javascript脚本
 //		webSettings.setJavaScriptEnabled(true);
-		 // 设置可以访问文件
+//		 // 设置可以访问文件
 //		 webSettings.setAllowFileAccess(true);
-		// 设置支持缩放
+//		// 设置支持缩放
 //		webSettings.setBuiltInZoomControls(true);
 		// 加载需要显示的网页
 //	 urlPath = "http://www.greattone.net/apple/html/index.html";
 		webview.loadUrl(urlPath);
 		// 设置Web视图
 		webview.setWebViewClient(new webViewClient());
-
-		setWebChromeClient();
+        webview.setDownloadListener(new MyWebViewDownLoadListener());
+        setWebChromeClient();
 		// if (android.os.Build.VERSION.SDK_INT >
 		// android.os.Build.VERSION_CODES.JELLY_BEAN) {
 		// webview.addJavascriptInterface(new WBBehavior(this), "myObj");
@@ -129,10 +139,15 @@ public class WebActivity extends AppCompatActivity {
 //        }
 
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-
-			view.loadUrl(url);
-			return true;
-		}
+            if(url.startsWith("http:") || url.startsWith("https:") ) {
+                view.loadUrl(url);
+                return true;
+            }else{
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);
+                return false;
+            }
+        }
 
 		@Override
 		public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -157,9 +172,9 @@ public class WebActivity extends AppCompatActivity {
 		@Override
 		public void onPageFinished(WebView view, String url) {
             setTitle(view.getTitle());
+            getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putString("url",webview.getUrl()).apply();
 			super.onPageFinished(view, url);
 		}
-
 //        @Override
 //        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
 //               try {
@@ -208,8 +223,26 @@ public class WebActivity extends AppCompatActivity {
 		}
 		super.onPause();
 	}
+    //内部类
+    private class MyWebViewDownLoadListener implements DownloadListener {
 
-	private ValueCallback<Uri> mUploadFile;  
+        @Override
+        public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype,
+                                    long contentLength) {
+            if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+                Toast t=Toast.makeText(WebActivity.this, "需要SD卡。", Toast.LENGTH_LONG);
+                t.setGravity(Gravity.CENTER, 0, 0);
+                t.show();
+                return;
+            }
+//            DownloaderTask task=new DownloaderTask();
+//            task.execute(url);
+        }
+
+    }
+
+
+    private ValueCallback<Uri> mUploadFile;
     /**拍照/选择文件请求码*/  
     private static final int REQUEST_UPLOAD_FILE_CODE = 12343;  
     /**
@@ -219,35 +252,16 @@ public class WebActivity extends AppCompatActivity {
     private void setWebChromeClient()
     {  
         if (null != webview)  
-        {  
-        	webview.setWebChromeClient(new WebChromeClient()  
-            {
+        {
+            webview.setOpenFileChooserListener(new ProgressWebView.OpenFileChooserListener() {
                 @Override
-                public void onCloseWindow(WebView window) {
-                    super.onCloseWindow(window);
+                public void openFileChooser(ValueCallback<Uri> uploadFile) {
+                    // Toast.makeText(WebviewActivity.this, "上传文件/图片",Toast.LENGTH_SHORT).show();
+                    mUploadFile = uploadFile;
+                    startActivityForResult(Intent.createChooser(createCameraIntent(), "Image Browser"), REQUEST_UPLOAD_FILE_CODE);
                 }
-
-                // Andorid 4.1+
-				public void openFileChooser(ValueCallback<Uri> uploadFile, String acceptType, String capture)  
-                {  
-                    openFileChooser(uploadFile);  
-                }  
-  
-                // Andorid 3.0 +  
-                public void openFileChooser(ValueCallback<Uri> uploadFile, String acceptType)  
-                {  
-                    openFileChooser(uploadFile);  
-                }  
-  
-                // Android 3.0  
-                public void openFileChooser(ValueCallback<Uri> uploadFile)  
-                {  
-                    // Toast.makeText(WebviewActivity.this, "上传文件/图片",Toast.LENGTH_SHORT).show();  
-                    mUploadFile = uploadFile;  
-                    startActivityForResult(Intent.createChooser(createCameraIntent(), "Image Browser"), REQUEST_UPLOAD_FILE_CODE);  
-                }  
-            });  
-        }  
+            });
+        }
     }  
   
     private Intent createCameraIntent()  
@@ -263,8 +277,8 @@ public class WebActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data)  
     {  
         if (requestCode == REQUEST_UPLOAD_FILE_CODE && resultCode == RESULT_OK)  
-        {  
-            if (null == mUploadFile)  
+        {
+            if (null == mUploadFile)
             {  
                 return;  
             }  
@@ -291,7 +305,12 @@ public class WebActivity extends AppCompatActivity {
                 }
             }
         }  
-        super.onActivityResult(requestCode, resultCode, data);  
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode==RESULT_OK&&resultCode==2){
+            String url=data.getStringExtra("url");
+            webview.loadUrl(url);
+        }
     }  
     /**处理拍照/选择的文件*/  
     private File handleFile(File file)  
@@ -327,6 +346,40 @@ public class WebActivity extends AppCompatActivity {
   
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.add_bookmark) {
+            try {
+                Dbutils.getInstance().dbAdd(webview.getTitle(),webview.getUrl());
+            } catch (DbException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }else
+        if (id == R.id.show_bookmarks) {
+            startActivityForResult(new Intent(this,ListActivity.class),2);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -345,7 +398,6 @@ public class WebActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        updateUrl();
     // webView.loadUrl("about:blank");
     super.onStop();
 }
@@ -357,16 +409,6 @@ public class WebActivity extends AppCompatActivity {
 
     @Override
     public void finish() {
-        updateUrl();
         super.finish();
-    }
-    boolean isUpdate;
-    private   void updateUrl(){
-        if(isUpdate){
-            return;
-        }
-        getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putString("url",webview.getUrl()).apply();
-        isUpdate=true;
-
     }
 }
