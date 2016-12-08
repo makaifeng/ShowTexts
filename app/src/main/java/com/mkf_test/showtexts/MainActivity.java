@@ -20,10 +20,11 @@ import org.xutils.view.annotation.ViewInject;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle("sss");
 //        setContentView(R.layout.activity_main);
 //        String url="http://m.biquge.com/13_13453/7436940.html";
 //        String url="http://m.greattone.net/app/music.php?classid=13&id=666";
-        String url="http://www.greattone.net/news/yinyue/2016-11-16/26071.html";
+        String url="http://blog.csdn.net/lemongirls/article/details/50845702";
         edittext.setText(url);
         lastUrl=getSharedPreferences(getPackageName(),MODE_PRIVATE).getString("url","");
         if(!TextUtils.isEmpty(lastUrl)){

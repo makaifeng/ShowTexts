@@ -34,6 +34,7 @@ public class ListActivity extends BaseActivity {
         setTitle("书签");
         try {
             webUrllist = Dbutils.getInstance().dbGetList();
+            if (webUrllist!=null)
             listView.setAdapter(new MyAdapter(this,webUrllist));
         } catch (DbException e) {
             e.printStackTrace();
