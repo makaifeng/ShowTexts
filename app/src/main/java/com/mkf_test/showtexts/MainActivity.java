@@ -20,7 +20,6 @@ import org.xutils.view.annotation.ViewInject;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTitle("sss");
 //        setContentView(R.layout.activity_main);
 //        String url="http://m.biquge.com/13_13453/7436940.html";
 //        String url="http://m.greattone.net/app/music.php?classid=13&id=666";
@@ -56,12 +55,12 @@ import org.xutils.view.annotation.ViewInject;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode==RESULT_OK&&resultCode==1) {
+        if (requestCode==1&&resultCode==RESULT_OK) {
             lastUrl = getSharedPreferences(getPackageName(), MODE_PRIVATE).getString("url", "");
             if (!TextUtils.isEmpty(lastUrl)) {
                 showLastUrl.setVisibility(View.VISIBLE);
             }
-        }else if (requestCode==RESULT_OK&&resultCode==2){
+        }else if (requestCode==2&&resultCode==RESULT_OK){
             String url=data.getStringExtra("url");
             startActivityForResult(new Intent(this,WebActivity.class).putExtra("url",url),1);
         }

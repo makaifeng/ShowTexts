@@ -13,11 +13,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.DownloadListener;
 import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
@@ -40,7 +40,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 @ContentView(R.layout.activity_web)
-public class WebActivity extends AppCompatActivity {
+public class WebActivity extends BaseActivity {
     @ViewInject(R.id.webview)
 	private ProgressWebView webview;
 	private String urlPath;
@@ -52,13 +52,18 @@ public class WebActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setNavigationShowableAndClickable(true, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(WebActivity.this, "333", Toast.LENGTH_SHORT).show();
+            }
+        });
         x.view().inject(this);
         try {
 			getIntentData();
 			initView();
 			startAction();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -398,6 +403,7 @@ public class WebActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putString("url",webview.getUrl()).apply();
     // webView.loadUrl("about:blank");
     super.onStop();
 }
