@@ -2,6 +2,7 @@
 <resources>
     <array name="longclickmsg">
         <item>打开</item>
+        <item>复制网址</item>
         <item>删除</item>
     </array>
 </resources>

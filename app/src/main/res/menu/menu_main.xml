@@ -3,13 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.mkftest.zxingdemo.MainActivity">
     <item
-        android:id="@+id/add_bookmark"
+        android:id="@+id/test"
         android:orderInCategory="100"
-        android:title="添加书签"
+        android:title="显示测试"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/show_bookmarks"
-        android:orderInCategory="100"
-        android:title="显示书签"
-        app:showAsAction="never" />
+
 </menu>

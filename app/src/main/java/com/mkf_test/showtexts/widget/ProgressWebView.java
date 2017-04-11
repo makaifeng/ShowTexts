@@ -24,6 +24,9 @@ public class ProgressWebView extends WebView {
     private ProgressBar progressbar;
 
     private ValueCallback<Uri> mUploadFile;
+    public ProgressWebView(Context context) {
+        super(context, null);
+    }
     public ProgressWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         progressbar = new ProgressBar(context, null,
@@ -48,10 +51,10 @@ public class ProgressWebView extends WebView {
     public void setOnProgressChangedListener(OnProgressChangedListener onProgressChangedListener) {
         this.onProgressChangedListener=onProgressChangedListener;
     }
-public  interface  OpenFileChooserListener{
+    public  interface  OpenFileChooserListener{
         void openFileChooser(ValueCallback<Uri> uploadFile) ;
     }
-public  interface  OnProgressChangedListener{
+    public  interface  OnProgressChangedListener{
         void  onProgressChanged(WebView view, int newProgress);
     }
     public class WebChromeClient extends android.webkit.WebChromeClient {

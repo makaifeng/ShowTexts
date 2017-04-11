@@ -1,5 +1,7 @@
 package com.mkf_test.showtexts;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -50,6 +52,35 @@ public class ListActivity extends BaseActivity {
                 openUrl(i);
             }
         });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, long id) {
+                new AlertDialog.Builder(ListActivity.this)
+                        .setItems(R.array.longclickmsg,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,
+                                                        int which) {
+                                        switch (which){
+                                            case 0://打开
+                                                openUrl(position);
+                                                break;
+                                            case 1://复制网址
+                                                ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                                                cm. setPrimaryClip(ClipData.newPlainText(null, webUrllist.get(position).getUrl()));
+                                                break;
+                                            case 2://删除
+                                                delectUrl(position);
+                                                parent.removeView(view);
+                                                break;
+                                        }
+
+                                    }
+                                })
+                        .show();
+                return true;
+            }
+        });
+
     }
     private  void openUrl(int position){
         if (webUrllist!=null) {
@@ -112,30 +143,6 @@ public class ListActivity extends BaseActivity {
 
             public void setPosition(final int position) {
                 name.setText(webUrllist.get(position).getName());
-                name.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View view) {
-                        new AlertDialog.Builder(ListActivity.this)
-                                .setItems(R.array.longclickmsg,
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog,
-                                                                int which) {
-                                                switch (which){
-                                                    case 0://打开
-                                                        openUrl(position);
-                                                        break;
-                                                    case 1://删除
-                                                        delectUrl(position);
-                                                        notifyDataSetChanged();
-                                                        break;
-                                                }
-
-                                            }
-                                        })
-                                .show();
-                        return false;
-                    }
-                });
             }
         }
     }

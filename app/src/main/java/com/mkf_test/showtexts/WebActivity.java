@@ -1,7 +1,10 @@
 package com.mkf_test.showtexts;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
@@ -10,11 +13,13 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,7 +36,6 @@ import com.mkf_test.showtexts.widget.ProgressWebView;
 import org.xutils.ex.DbException;
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.ViewInject;
-import org.xutils.x;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -55,10 +59,9 @@ public class WebActivity extends BaseActivity {
         setNavigationShowableAndClickable(true, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(WebActivity.this, "333", Toast.LENGTH_SHORT).show();
+               finish();
             }
         });
-        x.view().inject(this);
         try {
 			getIntentData();
 			initView();
@@ -95,13 +98,13 @@ public class WebActivity extends BaseActivity {
 
 	@SuppressLint("SetJavaScriptEnabled")
 	private void initView() {
-
-
 		WebSettings webSettings = webview.getSettings();
         //设置 缓存模式
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         // 开启 DOM storage API 功能
         webSettings.setDomStorageEnabled(true);
+        //开启 database storage API 功能
+        webSettings.setDatabaseEnabled(true);
 //        // 设置WebView属性，能够执行Javascript脚本
 //		webSettings.setJavaScriptEnabled(true);
 //		 // 设置可以访问文件
@@ -110,7 +113,12 @@ public class WebActivity extends BaseActivity {
 //		webSettings.setBuiltInZoomControls(true);
 		// 加载需要显示的网页
 //	 urlPath = "http://www.greattone.net/apple/html/index.html";
-		webview.loadUrl(urlPath);
+        if(Build.VERSION.SDK_INT >= 19) {
+            webSettings.setLoadsImagesAutomatically(true);
+        } else {
+            webSettings.setLoadsImagesAutomatically(false);
+        }
+        webview.loadUrl(urlPath);
 		// 设置Web视图
 		webview.setWebViewClient(new webViewClient());
         webview.setDownloadListener(new MyWebViewDownLoadListener());
@@ -145,6 +153,7 @@ public class WebActivity extends BaseActivity {
 
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             if(url.startsWith("http:") || url.startsWith("https:") ) {
+                getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putString("url",webview.getUrl()).commit();
                 view.loadUrl(url);
                 return true;
             }else{
@@ -176,8 +185,11 @@ public class WebActivity extends BaseActivity {
 
 		@Override
 		public void onPageFinished(WebView view, String url) {
+            if(!webview.getSettings().getLoadsImagesAutomatically()) {
+                webview.getSettings().setLoadsImagesAutomatically(true);
+            }
             setTitle(view.getTitle());
-            getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putString("url",webview.getUrl()).apply();
+            getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putString("url",webview.getUrl()).commit();
 			super.onPageFinished(view, url);
 		}
 //        @Override
@@ -222,7 +234,6 @@ public class WebActivity extends BaseActivity {
     }
 	@Override
 	protected void onPause() {
-        webview.onResume();
 		if (webview!=null) {
             webview.onResume();
 		}
@@ -351,11 +362,35 @@ public class WebActivity extends BaseActivity {
   
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        int maxheight=(int)(webview.getContentHeight()*webview.getScale());
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+
+            int sY=webview.getScrollY()+webview.getHeight();
+
+            if(webview.getContentHeight()*webview.getScale()-(webview.getHeight()+webview.getScrollY())<=0){
+                //已经处于底端
+            }else {
+                webview.setScrollY(sY<0?0:sY>maxheight?maxheight:sY);
+            }
+            return true;
+        } else      if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            int sY=webview.getScrollY()-webview.getHeight();
+            if (webview.getScaleY() == 0) {
+                //已经处于顶端
+            }else {
+                webview.setScrollY(sY < 0 ? 0 : sY);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_web, menu);
         return true;
     }
 
@@ -377,6 +412,11 @@ public class WebActivity extends BaseActivity {
         }else
         if (id == R.id.show_bookmarks) {
             startActivityForResult(new Intent(this,ListActivity.class),2);
+            return true;
+        }else
+        if (id == R.id.geturl) {
+            ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            cm. setPrimaryClip(ClipData.newPlainText(null, webview.getUrl()));
             return true;
         }
 

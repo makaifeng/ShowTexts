@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context="com.mkf_test.showtexts.MainActivity">
 
     <EditText
@@ -14,11 +15,12 @@
         android:layout_alignParentTop="true"
         android:layout_margin="15dp"
         android:layout_marginTop="50dp"
+        android:textColor="@color/black"
         android:text="" />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="跳转"
+        android:text="跳转到web"
         android:id="@+id/button"
         android:layout_marginTop="77dp"
         android:nestedScrollingEnabled="false"
@@ -26,18 +28,50 @@
         android:layout_below="@+id/editText"
         android:layout_alignLeft="@+id/editText"
         android:layout_alignStart="@+id/editText"
+        android:background="@drawable/progress_bar_states"
+        android:textColor="@color/color_button_text"
         tools:ignore="UnusedAttribute" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="跳转自定义页面"
+        android:id="@+id/button4"
+        android:nestedScrollingEnabled="false"
+        android:onClick="tomyview"
+        android:layout_alignTop="@+id/button"
+        android:layout_alignRight="@+id/editText"
+        android:layout_alignEnd="@+id/editText"
 
+        android:background="@drawable/progress_bar_states"
+        android:textColor="@color/color_button_text"
+        tools:ignore="UnusedAttribute" />
+    <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="跳转"-->
+        <!--android:id="@+id/button4"-->
+        <!--android:layout_marginTop="77dp"-->
+        <!--android:nestedScrollingEnabled="false"-->
+        <!--android:onClick="toshowtext"-->
+        <!--android:layout_below="@+id/button"-->
+        <!--android:layout_alignLeft="@+id/editText"-->
+        <!--android:layout_alignStart="@+id/editText"-->
+        <!--android:background="@drawable/progress_bar_states"-->
+        <!--android:textColor="@color/color_button_text"-->
+         />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="显示上次打开"
         android:id="@+id/button2"
         android:onClick="showLastUrl"
-        android:layout_alignTop="@+id/button"
-        android:layout_alignRight="@+id/editText"
-        android:layout_alignEnd="@+id/editText"
-        android:visibility="gone" />
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/button"
+        android:layout_alignLeft="@+id/editText"
+        android:layout_alignStart="@+id/editText"
+        android:background="@drawable/progress_bar_states"
+        android:textColor="@color/color_button_text"
+        android:visibility="gone"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -49,6 +83,8 @@
         android:layout_alignEnd="@+id/editText"
         android:layout_alignLeft="@+id/button"
         android:layout_alignStart="@+id/button"
+        android:background="@drawable/progress_bar_states"
+        android:textColor="@color/color_button_text"
         android:onClick="viewBookMarks" />
 
 </RelativeLayout>
