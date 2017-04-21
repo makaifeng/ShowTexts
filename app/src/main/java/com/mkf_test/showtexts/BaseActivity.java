@@ -60,9 +60,13 @@ public class BaseActivity extends AppCompatActivity {
             toolbar.setNavigationOnClickListener(NavigationClickListener);
         }
         setSupportActionBar(toolbar);
-
     }
-    public void setNavigationShowableAndClickable(boolean isNavigationShow,View.OnClickListener onClickListener) {
+
+    public void   setToolbarVisibility( int visibility){
+        toolbar.setVisibility(visibility);
+    }
+
+    public void setNavigationShowableAndClickable(boolean isNavigationShow, View.OnClickListener onClickListener) {
         this.isNavigationShow=isNavigationShow;
         this.NavigationClickListener=onClickListener;
         if (isNavigationShow) {

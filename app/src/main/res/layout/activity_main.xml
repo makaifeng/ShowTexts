@@ -72,6 +72,19 @@
         android:background="@drawable/progress_bar_states"
         android:textColor="@color/color_button_text"
         android:visibility="gone"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="打开上次自定义页面"
+        android:id="@+id/button5"
+        android:onClick="showLastUrl2"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/button"
+        android:layout_alignRight="@+id/editText"
+        android:layout_alignEnd="@+id/editText"
+        android:background="@drawable/progress_bar_states"
+        android:textColor="@color/color_button_text"
+        android:visibility="gone"/>
 
     <Button
         android:layout_width="wrap_content"

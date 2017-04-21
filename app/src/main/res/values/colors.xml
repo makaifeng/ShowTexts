@@ -2,6 +2,9 @@
 <resources>
     <color name="white">#ffffff</color>
     <color name="gray_eeeeee">#eeeeee</color>
+    <color name="gray_aaaaaa">#aaaaaa</color>
+    <color name="btn_color_efefef">#efefef</color>
+    <color name="btn_color_f7f7f7">#f7f7f7</color>
     <color name="black">#000000</color>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>

@@ -5,13 +5,18 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -21,6 +26,7 @@ import com.mkf_test.showtexts.adapter.ViewHolder;
 import com.mkf_test.showtexts.entity.ParseHttpData;
 import com.mkf_test.showtexts.entity.Route;
 import com.mkf_test.showtexts.utils.Dbutils;
+import com.mkf_test.showtexts.utils.DisplayUtil;
 import com.mkf_test.showtexts.utils.ParseHttpUtils;
 
 import org.xutils.ex.DbException;
@@ -33,8 +39,16 @@ import java.util.List;
 
 @ContentView(R.layout.activity_show_text)
 public class ShowTextActivity extends BaseActivity {
+    int bgcolors[]= {Color.argb(255,246,244,238),Color.argb(255,233,226,207),Color.argb(255,187,203,188),Color.argb(255,219,218,216),
+            Color.argb(255,42,57,51),Color.argb(255,43,35,30)};
+    int textcolors[]= {R.color.black,R.color.black,R.color.black,R.color.black,
+            R.color.white,R.color.white,};
     @ViewInject(R.id.text)
     TextView textView;
+    @ViewInject(R.id.tv_add)
+    TextView tv_add;
+    @ViewInject(R.id.tv_lessen)
+    TextView tv_lessen;
     @ViewInject(R.id.tv_prev)
     TextView tv_prev;
     @ViewInject(R.id.tv_catalog)
@@ -43,12 +57,17 @@ public class ShowTextActivity extends BaseActivity {
     TextView tv_next;
     @ViewInject(R.id.scrollView)
     ScrollView scrollView;
+    @ViewInject(R.id.hsv)
+    HorizontalScrollView hScrollView;
     @ViewInject(R.id.list)
     ListView listView;
+    @ViewInject(R.id.bottomView)
+    View bottomView;
     private String urlPath;
     private int orientation;
     ParseHttpData data;
-
+float textsize=0;
+int bgtype=-1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,17 +86,44 @@ public class ShowTextActivity extends BaseActivity {
         }else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
+
+        textsize=  getSharedPreferences(getPackageName(),MODE_PRIVATE).getFloat("textsize",18);
+        bgtype=getSharedPreferences(getPackageName(),MODE_PRIVATE).getInt("bgtype",-1);
+
     }
     private void initView() {
+        addHorizontalScrollView();
+        if (textsize!=0)textView.setTextSize(textsize);
+        if (bgtype!=-1&&bgtype<bgcolors.length) {
+            textView.setBackgroundColor(bgcolors[bgtype]);
+            textView.setTextColor(getResources().getColor(textcolors[bgtype]));
+        }
         ParseHttp();
+        textView.setOnClickListener(lis);
 
     }
 
+
+    View.OnClickListener lis=new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (v==textView){
+                if (data!=null&&data.getIsCatalog()==0) {
+                    if (bottomView.getVisibility() == View.VISIBLE)
+                        bottomView.setVisibility(View.GONE);
+                    else bottomView.setVisibility(View.VISIBLE);
+                }else {
+                    bottomView.setVisibility(View.GONE);
+                }
+            }
+        }
+    };
     private void ParseHttp() {
         ParseHttpUtils.ParseFromHttp(urlPath, new ParseHttpListener() {
             @Override
             public void ParseHttpSuccess(ParseHttpData data) {
                 if (data!=null){
+                    getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putString("url",urlPath).commit();
                     ShowTextActivity.this.data=data;
                     if (data.getTitle()!=null) setTitle(data.getTitle());
                     initViewData();
@@ -119,6 +165,26 @@ public class ShowTextActivity extends BaseActivity {
             ParseHttp();
         }
     }
+    /**
+     * 字体大小减小
+     * @param v
+     */
+    @Event(R.id.tv_lessen)
+    private void clickLessenSize(View v){
+        float textsize=textView.getTextSize()>DisplayUtil.dip2px(this,14)?textView.getTextSize()-DisplayUtil.dip2px(this,2):textView.getTextSize();
+        getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putFloat("textsize",DisplayUtil.px2dip(this,textsize)).commit();
+        textView.setTextSize(DisplayUtil.px2dip(this,textsize));
+    }
+    /**
+     * 字体大小增加
+     * @param v
+     */
+    @Event(R.id.tv_add)
+    private void clickAddSize(View v){
+        float textsize=textView.getTextSize()<DisplayUtil.dip2px(this,25)?textView.getTextSize()+DisplayUtil.dip2px(this,2):textView.getTextSize();
+        getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putFloat("textsize",DisplayUtil.px2dip(this,textsize)).commit();
+        textView.setTextSize(DisplayUtil.px2dip(this,textsize));
+    }
 
     private void initViewData() {
         if (data.getNextUrl()!=null) {    tv_next.setText(data.getNextUrl().getName());tv_next.setVisibility(View.VISIBLE);}else {tv_next.setVisibility(View.GONE);}
@@ -143,9 +209,41 @@ public class ShowTextActivity extends BaseActivity {
             listView.setVisibility(View.GONE);
             textView.setText(Html.fromHtml(data.getText()==null?"":data.getText()));
 
+
         }
     }
 
+    private void addHorizontalScrollView() {
+        LinearLayout ll=new LinearLayout(this);
+        ll.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,FrameLayout.LayoutParams.WRAP_CONTENT));
+        ll.setPadding(DisplayUtil.dip2px(this,15),0,DisplayUtil.dip2px(this,15),0);
+        ll.setOrientation(LinearLayout.HORIZONTAL);
+        for (int i=0;i<bgcolors.length;i++) {
+            RelativeLayout rl=new RelativeLayout(this);
+            LinearLayout.LayoutParams layoutParams=new  LinearLayout.LayoutParams((screenWidth-DisplayUtil.dip2px(this,30))/6,LinearLayout.LayoutParams.WRAP_CONTENT);
+            rl.setLayoutParams(layoutParams);
+            View v=new View(this);
+            RelativeLayout.LayoutParams LayoutParams2=   new RelativeLayout.LayoutParams(DisplayUtil.dip2px(this,20),DisplayUtil.dip2px(this,20));
+            LayoutParams2.addRule(RelativeLayout.CENTER_IN_PARENT);
+            LayoutParams2.topMargin=DisplayUtil.dip2px(this,20);
+            LayoutParams2.bottomMargin=DisplayUtil.dip2px(this,20);
+            v.setLayoutParams(LayoutParams2);
+            v.setBackgroundColor(bgcolors[i]);
+            final int position=i;
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putInt("bgtype",position).commit();
+                    textView.setBackgroundColor(bgcolors[position]);
+                    textView.setTextColor(getResources().getColor(textcolors[position]));
+                }
+            });
+            rl.addView(v);
+            ll.addView(rl);
+        }
+
+        hScrollView.addView(ll);
+    }
 
 
 

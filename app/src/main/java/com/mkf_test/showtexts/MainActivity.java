@@ -3,9 +3,13 @@ package com.mkf_test.showtexts;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.mkf_test.showtexts.ui.ShowTextActivity2;
 
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.ViewInject;
@@ -16,18 +20,21 @@ import org.xutils.view.annotation.ViewInject;
         private EditText edittext;
         @ViewInject(R.id.button2)
     private Button showLastUrl;
+        @ViewInject(R.id.button5)
+    private Button showLastUrl2;
     String lastUrl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_main);
-        String url="http://m.6mao.com/wapbook/4025_9559214.html";
+//        String url="http://m.6mao.com/wapbook/4025_9559214.html";
 //        String url="http://m.greattone.net/app/music.php?classid=13&id=666";
-//        String url="";
+        String url="";
         edittext.setText(url);
         lastUrl=getSharedPreferences(getPackageName(),MODE_PRIVATE).getString("url","");
         if(!TextUtils.isEmpty(lastUrl)){
             showLastUrl.setVisibility(View.VISIBLE);
+            showLastUrl2.setVisibility(View.VISIBLE);
         }
 //        setSupportActionBar(toolbar);
     }
@@ -47,33 +54,36 @@ import org.xutils.view.annotation.ViewInject;
         startActivityForResult(new Intent(this,WebActivity.class).putExtra("url",lastUrl),1);
 
     }
+    public void showLastUrl2(View v){
+        startActivityForResult(new Intent(this,ShowTextActivity.class).putExtra("url",lastUrl),1);
+    }
     public void viewBookMarks(View v){
         startActivityForResult(new Intent(this,ListActivity.class),2);
     }
-//@Override
-//public boolean onCreateOptionsMenu(Menu menu) {
-//    // Inflate the menu; this adds items to the action bar if it is present.
-//    getMenuInflater().inflate(R.menu.menu_main, menu);
-//    return true;
-//}
+@Override
+public boolean onCreateOptionsMenu(Menu menu) {
+    // Inflate the menu; this adds items to the action bar if it is present.
+    getMenuInflater().inflate(R.menu.menu_main, menu);
+    return true;
+}
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.test) {
-//            String url=edittext.getText().toString().trim();
-//            startActivityForResult(new Intent(this,ShowTextActivity.class).putExtra("url",url),3);
-//            return true;
-//        }
-//
-//
-//        return super.onOptionsItemSelected(item);
-//    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.test) {
+            String url=edittext.getText().toString().trim();
+            startActivityForResult(new Intent(this,ShowTextActivity2.class).putExtra("url",url),3);
+            return true;
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
     @Override
     protected void onResume() {
         super.onResume();
