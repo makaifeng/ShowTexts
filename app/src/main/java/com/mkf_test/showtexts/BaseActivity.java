@@ -14,7 +14,7 @@ import android.widget.FrameLayout;
 import org.xutils.x;
 
 /**
- * Created by Administrator on 2016/11/14.
+ * Created by mkf on 2016/11/14.
  */
 public class BaseActivity extends AppCompatActivity {
     public CoordinatorLayout headlayout;
