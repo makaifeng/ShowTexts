@@ -17,3 +17,4 @@ public class MyApplication extends Application {
 //        com.wanjian.sak.LayoutManager.init(this);
     }
 }
+

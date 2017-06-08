@@ -20,8 +20,11 @@ public class HttpUtil {
 	 * 发送网络请求
 	 * @return
 	 */
-	public static void sendHttpForBack(final String url,final String msg, final String method,final Map<String, String> headmap,final httpback httpback) {
+	public static void sendHttpForBack(final String url,final String msg, final String method,String charset,final Map<String, String> headmap,final httpback httpback) {
 		RequestParams params = new RequestParams(url);
+//		params.setHeader("Content-Type","text/html;charset=gbk");
+//		params.setCharset("gbk");
+		params.setCharset(charset);
 		Callback.Cancelable cancelable
 				= x.http().get(params,
 				new Callback.CommonCallback<String>() {
@@ -110,7 +113,13 @@ public class HttpUtil {
 //		}).start();
 	}
 	public static void sendHttpForBack(String url, final String method,Map<String, String> headmap,httpback back) {
-		sendHttpForBack(url, "", method,headmap,back);
+		sendHttpForBack(url, "", method,"utf-8",headmap,back);
+	}
+	public static void sendHttpForBack(String url, final String method,String charset,httpback back) {
+		sendHttpForBack(url, "", method,charset,null,back);
+	}
+	public static void sendHttpForBack(String url, String charset,httpback back) {
+		sendHttpForBack(url, "", GET,charset,null,back);
 	}
 	private static String getPostMsg(HashMap< String, String> map) {
 		StringBuilder builder = new StringBuilder();

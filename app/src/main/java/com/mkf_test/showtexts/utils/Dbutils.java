@@ -48,6 +48,9 @@ public class Dbutils {
         //.setDbDir(null);//设置数据库.db文件存放的目录,默认为包名下databases目录下  // 不设置dbDir时, 默认存储在app的私有目录.
         db = x.getDb(daoConfig);
     }
+    public  DbManager getDbManager(){
+        return db;
+    }
     public void dbAdd(String name,String url) throws DbException {
         //User user = new User("Kevingo","caolbmail@gmail.com","13299999999",new Date());
         //db.save(user);//保存成功之后【不会】对user的主键进行赋值绑定
@@ -57,6 +60,14 @@ public class Dbutils {
         webUrl.setName(name);
         webUrl.setUrl(url);
         db.saveBindingId(webUrl);
+//        showDbMessage("【dbAdd】第一个对象:" + users.get(0).toString());//user的主键Id不为0
+    }
+    public void dbAdd(Object oj) throws DbException {
+        //User user = new User("Kevingo","caolbmail@gmail.com","13299999999",new Date());
+        //db.save(user);//保存成功之后【不会】对user的主键进行赋值绑定
+        //db.saveOrUpdate(user);//保存成功之后【会】对user的主键进行赋值绑定
+        //db.saveBindingId(user);//保存成功之后【会】对user的主键进行赋值绑定,并返回保存是否成功
+        db.saveBindingId(oj);
 //        showDbMessage("【dbAdd】第一个对象:" + users.get(0).toString());//user的主键Id不为0
     }
     public  List<WebUrl> dbFind(String url) throws DbException {

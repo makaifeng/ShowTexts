@@ -2,6 +2,7 @@ package com.mkf_test.showtexts.ParseHttp;
 
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 
 import com.mkf_test.showtexts.entity.ParseHttpData;
 import com.mkf_test.showtexts.entity.Route;
@@ -73,22 +74,76 @@ public class ParseHttp3 {
             Document doc = Jsoup.connect(url).get();
 
 //            Element content = doc.getElementById("content");
+            Elements links1 = doc.getElementsByTag("article");
+            for (Element link : links1) {
+                if (link.id().equals("nr")){
+                    String text = link.html();
+                    data.setText(text);
+                    break;
+                }
+            }
+            Elements links3= doc.getElementsByTag("title");
+            for (Element link : links3) {
+                    String title = link.html();
+                    data.setTitle(title);
+                    break;
+            }
+
+
             Elements links = doc.getElementsByTag("div");
-            StringBuffer sb=new StringBuffer();
             for (Element link : links) {
+                if (!TextUtils.isEmpty(data.getTitle())&&!TextUtils.isEmpty(data.getText())){
+                    break;
+                }
+                if (link.id().equals("content")){
+                    Element link0=  link.getElementById("hl");
+                    String title = link0.html();
+                    data.setTitle(title);
+                }else
                 if (link.id().equals("nr1")){
                     String text = link.html();
                     data.setText(text);
                     break;
-                }else   if (link.id().equals("nr_title")){
+                }else   if (link.id().equals("neirong")){
+                    String text = link.html();
+                    data.setText(text);
+                    break;
+                }else   if (link.id().equals("nr")){
+                    String text = link.html();
+                    data.setText(text);
+                    break;
+                }else   if (link.id().equals("nr_title")&& TextUtils.isEmpty(data.getTitle())){
                     String  title=link.text();
                     data.setTitle(title);
                 }
             }
 
+
             Elements links2 = doc.getElementsByTag("a");
             for (Element link : links2) {
+                if (link.className().equals("dise")) {
+                    Route r = new Route();
+                    if (link.text().equals("上一章")) {
+                        r.setName(link.text()); //取得文本
+                        r.setUrl(link.absUrl("href")); //取得链接地址
+                        data.setPrevUrl(r);
+                    }else  if (link.text().equals("目录")) {
+                        r.setName(link.text()); //取得文本
+                        r.setUrl(link.absUrl("href")); //取得链接地址
+                        data.setCatalogUrl(r);
+                    }else {
+                        r.setName(link.text()); //取得文本
+                        r.setUrl(link.absUrl("href")); //取得链接地址
+                        data.setNextUrl(r);
+                    }
+                }else
                 if (link.id().equals("pt_prev")) {
+                    Route r=new Route();
+                    r.setName(link.text()); //取得文本
+                    r.setUrl(link.absUrl("href")); //取得链接地址
+                    data.setPrevUrl(r);
+                }else
+                if (link.id().equals("prev")) {
                     Route r=new Route();
                     r.setName(link.text()); //取得文本
                     r.setUrl(link.absUrl("href")); //取得链接地址
@@ -100,7 +155,19 @@ public class ParseHttp3 {
                     r.setUrl(link.absUrl("href")); //取得链接地址
                     data.setNextUrl(r);
                 }else
+                if (link.id().equals("next")) {
+                    Route r=new Route();
+                    r.setName(link.text()); //取得文本
+                    r.setUrl(link.absUrl("href")); //取得链接地址
+                    data.setNextUrl(r);
+                }else
                 if (link.id().equals("pt_mulu")) {
+                    Route r=new Route();
+                    r.setName(link.text()); //取得文本
+                    r.setUrl(link.absUrl("href")); //取得链接地址
+                    data.setCatalogUrl(r);
+                }else
+                if (link.id().equals("liebiao")) {
                     Route r=new Route();
                     r.setName(link.text()); //取得文本
                     r.setUrl(link.absUrl("href")); //取得链接地址

@@ -78,6 +78,7 @@ public boolean onCreateOptionsMenu(Menu menu) {
         if (id == R.id.test) {
             String url=edittext.getText().toString().trim();
             startActivityForResult(new Intent(this,ShowTextActivity2.class).putExtra("url",url),3);
+//            startActivityForResult(new Intent(this,Test.class),3);
             return true;
         }
 

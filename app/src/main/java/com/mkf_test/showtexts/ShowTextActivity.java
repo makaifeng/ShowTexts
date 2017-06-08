@@ -8,6 +8,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,12 +24,14 @@ import android.widget.TextView;
 import com.mkf_test.showtexts.ParseHttp.ParseHttpListener;
 import com.mkf_test.showtexts.adapter.Adapter;
 import com.mkf_test.showtexts.adapter.ViewHolder;
+import com.mkf_test.showtexts.db.BookDB;
 import com.mkf_test.showtexts.entity.ParseHttpData;
 import com.mkf_test.showtexts.entity.Route;
 import com.mkf_test.showtexts.utils.Dbutils;
 import com.mkf_test.showtexts.utils.DisplayUtil;
 import com.mkf_test.showtexts.utils.ParseHttpUtils;
 
+import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.Event;
@@ -47,6 +50,8 @@ public class ShowTextActivity extends BaseActivity {
     TextView textView;
     @ViewInject(R.id.tv_add)
     TextView tv_add;
+//    @ViewInject(R.id.tv_btn1)
+//    TextView tv_cache_all;//缓存全文
     @ViewInject(R.id.tv_lessen)
     TextView tv_lessen;
     @ViewInject(R.id.tv_prev)
@@ -68,11 +73,20 @@ public class ShowTextActivity extends BaseActivity {
     ParseHttpData data;
 float textsize=0;
 int bgtype=-1;
+    Dbutils db;
+    BookDB book;
+    DbManager.DaoConfig daoConfig = new DbManager.DaoConfig()           ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e("TAG", "onCreate: "+getCacheDir() );
         getIntentData();
+        initDB();
         initView();
+    }
+
+    private void initDB() {
+       db= Dbutils.getInstance();
     }
 
     private void getIntentData() {
@@ -98,9 +112,41 @@ int bgtype=-1;
             textView.setBackgroundColor(bgcolors[bgtype]);
             textView.setTextColor(getResources().getColor(textcolors[bgtype]));
         }
-        ParseHttp();
-        textView.setOnClickListener(lis);
 
+        textView.setOnClickListener(lis);
+        initdata();
+
+    }
+
+    /**
+     * 加载数据
+     */
+    private void initdata() {
+        try {
+            book = db.getDbManager().selector(BookDB.class).where("curUrl", "=",urlPath).findFirst();
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+        if (book!=null){
+            data=new ParseHttpData();
+            data.setTitle(book.getTitle());
+            data.setText(book.getText());
+            Route prevUrl=new Route();
+            prevUrl.setUrl(book.getPrevUrl());
+            prevUrl.setName("上一章");
+            data.setPrevUrl(prevUrl);
+            Route nextUrl=new Route();
+            nextUrl.setUrl(book.getNextUrl());
+            nextUrl.setName("下一章");
+            data.setNextUrl(nextUrl);
+            Route catalogUrl=new Route();
+            catalogUrl.setUrl(book.getCatalogUrl());
+            catalogUrl.setName("目录");
+            data.setCatalogUrl(catalogUrl);
+            initViewData();
+        }else {
+            ParseHttp();
+        }
     }
 
 
@@ -125,11 +171,30 @@ int bgtype=-1;
                 if (data!=null){
                     getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putString("url",urlPath).commit();
                     ShowTextActivity.this.data=data;
-                    if (data.getTitle()!=null) setTitle(data.getTitle());
+                    addToDB(data);
                     initViewData();
                 }
             }
+
+
         });
+    }
+
+    private void addToDB(ParseHttpData data) {
+        if (data.getIsCatalog()==0){
+            try {
+                BookDB book=new BookDB();
+                book.setNextUrl(data.getNextUrl().getUrl());
+                book.setPrevUrl(data.getPrevUrl().getUrl());
+                book.setCurUrl(urlPath);
+                book.setCatalogUrl(data.getCatalogUrl().getUrl());
+                book.setText(data.getText());
+                book.setTitle(data.getTitle());
+               db.dbAdd(book);
+            } catch (DbException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -140,7 +205,7 @@ int bgtype=-1;
     private void clickPrev(View v){
         if (data.getPrevUrl()!=null&&data.getPrevUrl().getUrl()!=null)    {
             urlPath=data.getPrevUrl().getUrl();
-            ParseHttp();
+            initdata();
         }
     }
     /**
@@ -151,7 +216,7 @@ int bgtype=-1;
     private void clickNext(View v){
         if (data.getNextUrl()!=null&&data.getNextUrl().getUrl()!=null)   {
             urlPath=data.getNextUrl().getUrl();
-            ParseHttp();
+            initdata();
         }
     }
     /**
@@ -162,7 +227,7 @@ int bgtype=-1;
     private void clickCatalog(View v){
         if (data.getCatalogUrl()!=null&&data.getCatalogUrl().getUrl()!=null) {
             urlPath = data.getCatalogUrl().getUrl();
-            ParseHttp();
+            initdata();
         }
     }
     /**
@@ -185,11 +250,23 @@ int bgtype=-1;
         getSharedPreferences(getPackageName(),MODE_PRIVATE).edit().putFloat("textsize",DisplayUtil.px2dip(this,textsize)).commit();
         textView.setTextSize(DisplayUtil.px2dip(this,textsize));
     }
+//    /**
+//     * 缓存全文
+//     * @param v
+//     */
+//    @Event(R.id.tv_btn1)
+//    private void cacheAll(View v){
+//        new CacheALLText(db,data).start();
+//
+//
+//    }
+
 
     private void initViewData() {
         if (data.getNextUrl()!=null) {    tv_next.setText(data.getNextUrl().getName());tv_next.setVisibility(View.VISIBLE);}else {tv_next.setVisibility(View.GONE);}
         if (data.getPrevUrl()!=null) {    tv_prev.setText(data.getPrevUrl().getName());tv_prev.setVisibility(View.VISIBLE);}else {tv_prev.setVisibility(View.GONE);}
         if (data.getCatalogUrl()!=null) {    tv_catalog.setText(data.getCatalogUrl().getName());tv_catalog.setVisibility(View.VISIBLE);}else {tv_catalog.setVisibility(View.GONE);}
+        if (data.getTitle()!=null)    setTitle(data.getTitle());
         if (data.getIsCatalog()==1){
             scrollView.setVisibility(View.GONE);
             listView.setVisibility(View.VISIBLE);

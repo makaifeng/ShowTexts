@@ -56,7 +56,6 @@ public class FlipView extends View {
     private Typeface typeface=Typeface.DEFAULT;//字体
     private int bgColor = 0xffe7dcbe;       //背景颜色
     private int textColor = 0x8A000000;    //字体颜色
-    private int paraIndex=0;//段落索引
     private float mTextSize ;            //字体大小
 //    public void setPage(Page page, PageText pagetext) {
 //        this.mPage = page;

@@ -62,10 +62,10 @@ public class ParseHttpUtils {
     private static void parseHttp3(String url, ParseHttpListener listener) {
             String s=url.substring(url.lastIndexOf("/")+1,url.lastIndexOf("."));
             if (s.contains("_")) {//是目录
-                ParseHttp3 parseHttp=new ParseHttp3( url, 0, listener);
+                ParseHttp3 parseHttp=new ParseHttp3( url, 1, listener);
                 parseHttp.start();
             }else {//是内容页
-                ParseHttp3 parseHttp=new ParseHttp3( url, 1, listener);
+                ParseHttp3 parseHttp=new ParseHttp3( url, 0, listener);
                 parseHttp.start();
             }
     }
