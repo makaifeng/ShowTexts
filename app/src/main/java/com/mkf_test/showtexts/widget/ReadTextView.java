@@ -1,7 +1,7 @@
 package com.mkf_test.showtexts.widget;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.Layout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -10,7 +10,7 @@ import android.util.AttributeSet;
  * Created by mkf on 2017/4/13.
  */
 
-public class ReadTextView extends android.support.v7.widget.AppCompatTextView {
+public class ReadTextView extends androidx.appcompat.widget.AppCompatTextView {
     private CharSequence mText;
     float downX;
     float downY;

@@ -1,4 +1,4 @@
-package com.mkf_test.showtexts.db;
+package com.mkf_test.showtexts.db.table;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
@@ -12,7 +12,7 @@ import org.greenrobot.greendao.annotation.Generated;
 public class BookDB {
     @Id
     @Property(nameInDb = "id")
-    private int id;
+    private Long id;
     @Property(nameInDb ="text")
     private String text;
     @Property(nameInDb ="title")
@@ -32,8 +32,9 @@ public class BookDB {
     //    return db.selector(Child.class).where("parentId", "=", this.id).findFirst();
     //}
 
-    @Generated(hash = 947005869)
-    public BookDB(int id, String text, String title, String prevUrl, String nextUrl,
+
+    @Generated(hash = 1399471306)
+    public BookDB(Long id, String text, String title, String prevUrl, String nextUrl,
             String catalogUrl, String curUrl, String bookname) {
         this.id = id;
         this.text = text;
@@ -49,6 +50,7 @@ public class BookDB {
     public BookDB() {
     }
 
+
     public String getCurUrl() {
         return curUrl;
     }
@@ -57,13 +59,7 @@ public class BookDB {
         this.curUrl = curUrl;
     }
 
-    public int getId() {
-        return id;
-    }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getText() {
         return text;
@@ -111,5 +107,13 @@ public class BookDB {
 
     public void setBookname(String bookname) {
         this.bookname = bookname;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

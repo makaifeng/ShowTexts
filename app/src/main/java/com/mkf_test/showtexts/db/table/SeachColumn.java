@@ -1,4 +1,4 @@
-package com.mkf_test.showtexts.db;
+package com.mkf_test.showtexts.db.table;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
@@ -12,7 +12,7 @@ import org.greenrobot.greendao.annotation.Generated;
 public class SeachColumn {
     @Id
     @Property(nameInDb = "id")
-    private int id;
+    private Long id;
     @Property(nameInDb = "nameColumn")
     String nameColumn;
     @Property(nameInDb = "prevColumn")
@@ -26,8 +26,9 @@ public class SeachColumn {
     @Property(nameInDb = "codingFormat")
     String codingFormat;
 
-    @Generated(hash = 1063248400)
-    public SeachColumn(int id, String nameColumn, String prevColumn,
+
+    @Generated(hash = 1054395335)
+    public SeachColumn(Long id, String nameColumn, String prevColumn,
             String nextColumn, String muluColumn, String contentCoulmn,
             String codingFormat) {
         this.id = id;
@@ -42,6 +43,7 @@ public class SeachColumn {
     @Generated(hash = 1917799156)
     public SeachColumn() {
     }
+
 
     public String getMuluColumn() {
         return muluColumn;
@@ -59,13 +61,6 @@ public class SeachColumn {
         this.codingFormat = codingFormat;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getNameColumn() {
         return nameColumn;
@@ -97,5 +92,13 @@ public class SeachColumn {
 
     public void setContentCoulmn(String contentCoulmn) {
         this.contentCoulmn = contentCoulmn;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

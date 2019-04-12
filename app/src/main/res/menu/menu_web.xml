@@ -17,4 +17,9 @@
         android:orderInCategory="100"
         android:title="获取链接"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/reload"
+        android:orderInCategory="100"
+        android:title="重新加载"
+        app:showAsAction="never" />
 </menu>

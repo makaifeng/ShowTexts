@@ -1,5 +1,6 @@
 package com.mkf_test.showtexts.utils;
 
+import com.mkf_test.showtexts.ParseHttp.ParseHttp;
 import com.mkf_test.showtexts.ParseHttp.ParseHttp1;
 import com.mkf_test.showtexts.ParseHttp.ParseHttp2;
 import com.mkf_test.showtexts.ParseHttp.ParseHttp3;
@@ -24,7 +25,8 @@ public class ParseHttpUtils {
         }else if (url.startsWith("http://m.6mao.com")||url.startsWith("https://m.6mao.com")){
             parseHttp3( url, listener);
         }else{
-
+            ParseHttp parseHttp=new ParseHttp( url,  listener);
+            parseHttp.start();
         }
 
     }

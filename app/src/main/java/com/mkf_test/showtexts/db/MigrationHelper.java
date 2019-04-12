@@ -1,10 +1,11 @@
-package com.yuqiang.uchon.lib.greendao;
+package com.mkf_test.showtexts.db;
 
 import android.database.Cursor;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.yuqiang.uchon.lib.greendao.bean.table.DaoMaster;
+
+import com.mkf_test.showtexts.db.table.DaoMaster;
 
 import org.greenrobot.greendao.AbstractDao;
 import org.greenrobot.greendao.database.Database;
@@ -16,7 +17,7 @@ import java.util.List;
 
 /**
  * Created by 马凯风 on 2018/1/23.
- *  数据库迁移  用于数据版本升级
+ * 数据库迁移  用于数据版本升级
  */
 
 public class MigrationHelper {

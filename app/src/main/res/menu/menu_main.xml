@@ -7,5 +7,10 @@
         android:orderInCategory="100"
         android:title="显示测试"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/addtag"
+        android:orderInCategory="100"
+        android:title="添加标签"
+        app:showAsAction="never" />
 
 </menu>

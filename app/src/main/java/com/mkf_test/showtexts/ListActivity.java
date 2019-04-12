@@ -5,7 +5,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,24 +13,27 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.mkf_test.showtexts.db.WebUrl;
+import com.mkf_test.showtexts.db.table.WebUrl;
 import com.mkf_test.showtexts.utils.Dbutils;
-
-import org.xutils.ex.DbException;
-import org.xutils.view.annotation.ContentView;
-import org.xutils.view.annotation.ViewInject;
 
 import java.util.List;
 
-@ContentView(R.layout.activity_list)
+import androidx.appcompat.app.AlertDialog;
+import butterknife.BindView;
+
 public class ListActivity extends BaseActivity {
-    @ViewInject(R.id.list)
-    private ListView listView;
+    @BindView(R.id.list)
+    ListView listView;
     List<WebUrl> webUrllist;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initData();
+    }
+
+    @Override
+    public int getLayoutResId() {
+        return R.layout.activity_list;
     }
 
     private void initData() {
@@ -41,7 +43,7 @@ public class ListActivity extends BaseActivity {
             webUrllist = Dbutils.getInstance().dbGetList();
             if (webUrllist!=null)
             listView.setAdapter(new MyAdapter(this,webUrllist));
-        } catch (DbException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -70,7 +72,7 @@ public class ListActivity extends BaseActivity {
                                                 break;
                                             case 2://删除
                                                 delectUrl(position);
-                                                parent.removeView(view);
+                                                ((MyAdapter)listView.getAdapter()).notifyDataSetChanged();
                                                 break;
                                         }
 
@@ -93,7 +95,7 @@ public class ListActivity extends BaseActivity {
             try {
                 Dbutils.getInstance().dbDelete(webUrllist.get(position));
                 webUrllist.remove(position);
-            } catch (DbException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

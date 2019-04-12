@@ -1,4 +1,4 @@
-package com.yuqiang.uchon.lib.greendao.query;
+package com.mkf_test.showtexts.db.query;
 
 import java.util.List;
 
