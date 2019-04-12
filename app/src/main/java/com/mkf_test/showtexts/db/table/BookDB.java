@@ -1,33 +1,53 @@
 package com.mkf_test.showtexts.db;
 
-import org.xutils.db.annotation.Column;
-import org.xutils.db.annotation.Table;
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Property;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by Administrator on 2017/5/12.
  */
-@Table(name = "chapter", onCreated = "CREATE UNIQUE INDEX realative_unique ON chapter(curUrl)") //为表创建)
+@Entity(nameInDb = "BookDB") //为表创建)
 public class BookDB {
-    @Column(name = "id", isId = true)
+    @Id
+    @Property(nameInDb = "id")
     private int id;
-    @Column(name = "text",property = "NOT NULL")
+    @Property(nameInDb ="text")
     private String text;
-    @Column(name = "title",property = "NOT NULL")
+    @Property(nameInDb ="title")
     private String title;
-    @Column(name = "prevUrl",property = "NOT NULL")
+    @Property(nameInDb ="prevUrl")
     private   String  prevUrl;
-    @Column(name = "nextUrl",property = "NOT NULL")
+    @Property(nameInDb ="nextUrl")
     private String nextUrl;
-    @Column(name = "catalogUrl",property = "NOT NULL")
+    @Property(nameInDb ="catalogUrl")
     private String catalogUrl;
-    @Column(name = "curUrl",property = "NOT NULL")
+    @Property(nameInDb ="curUrl")
     private String curUrl;
-    @Column(name = "bookname",property = "NOT NULL")
+    @Property(nameInDb ="bookname")
     private String bookname="";
     // 一对一
     //public Child getChild(DbManager db) throws DbException {
     //    return db.selector(Child.class).where("parentId", "=", this.id).findFirst();
     //}
+
+    @Generated(hash = 947005869)
+    public BookDB(int id, String text, String title, String prevUrl, String nextUrl,
+            String catalogUrl, String curUrl, String bookname) {
+        this.id = id;
+        this.text = text;
+        this.title = title;
+        this.prevUrl = prevUrl;
+        this.nextUrl = nextUrl;
+        this.catalogUrl = catalogUrl;
+        this.curUrl = curUrl;
+        this.bookname = bookname;
+    }
+
+    @Generated(hash = 1163213190)
+    public BookDB() {
+    }
 
     public String getCurUrl() {
         return curUrl;
