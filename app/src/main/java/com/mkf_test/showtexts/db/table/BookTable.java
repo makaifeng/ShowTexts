@@ -1,9 +1,10 @@
-package com.mkf_test.showtexts.db;
+package com.mkf_test.showtexts.db.table;
+
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
-import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by Administrator on 2017/5/12.

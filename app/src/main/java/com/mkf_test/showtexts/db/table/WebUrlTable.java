@@ -1,4 +1,4 @@
-package com.mkf_test.showtexts.db;
+package com.mkf_test.showtexts.db.table;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
