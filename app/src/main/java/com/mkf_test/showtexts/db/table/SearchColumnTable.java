@@ -9,7 +9,7 @@ import org.greenrobot.greendao.annotation.Generated;
  * Created by 马凯风 on 2018/3/23.
  */
 @Entity(nameInDb = "SeachColumn")
-public class SeachColumn {
+public class SearchColumnTable {
     @Id
     @Property(nameInDb = "id")
     private Long id;
@@ -26,9 +26,8 @@ public class SeachColumn {
     @Property(nameInDb = "codingFormat")
     String codingFormat;
 
-
-    @Generated(hash = 1054395335)
-    public SeachColumn(Long id, String nameColumn, String prevColumn,
+    @Generated(hash = 1384838773)
+    public SearchColumnTable(Long id, String nameColumn, String prevColumn,
             String nextColumn, String muluColumn, String contentCoulmn,
             String codingFormat) {
         this.id = id;
@@ -40,10 +39,9 @@ public class SeachColumn {
         this.codingFormat = codingFormat;
     }
 
-    @Generated(hash = 1917799156)
-    public SeachColumn() {
+    @Generated(hash = 44057713)
+    public SearchColumnTable() {
     }
-
 
     public String getMuluColumn() {
         return muluColumn;
@@ -61,13 +59,6 @@ public class SeachColumn {
         this.codingFormat = codingFormat;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getNameColumn() {
         return nameColumn;

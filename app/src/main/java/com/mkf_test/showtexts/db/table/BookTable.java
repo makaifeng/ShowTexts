@@ -9,7 +9,7 @@ import org.greenrobot.greendao.annotation.Generated;
  * Created by Administrator on 2017/5/12.
  */
 @Entity(nameInDb = "BookDB") //为表创建)
-public class BookDB {
+public class BookTable {
     @Id
     @Property(nameInDb = "id")
     private Long id;
@@ -32,9 +32,8 @@ public class BookDB {
     //    return db.selector(Child.class).where("parentId", "=", this.id).findFirst();
     //}
 
-
-    @Generated(hash = 1399471306)
-    public BookDB(Long id, String text, String title, String prevUrl, String nextUrl,
+    @Generated(hash = 800404253)
+    public BookTable(Long id, String text, String title, String prevUrl, String nextUrl,
             String catalogUrl, String curUrl, String bookname) {
         this.id = id;
         this.text = text;
@@ -46,10 +45,9 @@ public class BookDB {
         this.bookname = bookname;
     }
 
-    @Generated(hash = 1163213190)
-    public BookDB() {
+    @Generated(hash = 1470141119)
+    public BookTable() {
     }
-
 
     public String getCurUrl() {
         return curUrl;
@@ -57,14 +55,6 @@ public class BookDB {
 
     public void setCurUrl(String curUrl) {
         this.curUrl = curUrl;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getText() {

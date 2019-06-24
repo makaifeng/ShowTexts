@@ -8,11 +8,12 @@ import android.widget.TextView;
 
 import com.mkf_test.showtexts.BaseActivity;
 import com.mkf_test.showtexts.R;
-import com.mkf_test.showtexts.db.table.SeachColumn;
+import com.mkf_test.showtexts.db.table.SearchColumnTable;
 import com.mkf_test.showtexts.utils.Dbutils;
 import com.mkf_test.showtexts.utils.HttpUtil;
 
 import butterknife.BindView;
+
 
 public class AddTagActivity extends BaseActivity {
     @BindView(R.id.text)
@@ -63,7 +64,7 @@ public class AddTagActivity extends BaseActivity {
                 if (next.equals("")) return;
                 if (content.equals("")) return;
                 try {
-                    SeachColumn seachColumn = new SeachColumn();
+                    SearchColumnTable seachColumn = new SearchColumnTable();
                     seachColumn.setCodingFormat("gbk");
                     seachColumn.setNameColumn(title);
                     seachColumn.setPrevColumn(prev);
