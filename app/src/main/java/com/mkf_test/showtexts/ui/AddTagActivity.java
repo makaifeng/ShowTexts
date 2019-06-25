@@ -14,7 +14,6 @@ import com.mkf_test.showtexts.R;
 import com.mkf_test.showtexts.db.GreenDaoManager;
 import com.mkf_test.showtexts.db.query.SearchColumnTableQuery;
 import com.mkf_test.showtexts.db.table.SearchColumnTable;
-import com.mkf_test.showtexts.utils.Dbutils;
 import com.mkf_test.showtexts.utils.HttpUtil;
 
 import java.util.List;

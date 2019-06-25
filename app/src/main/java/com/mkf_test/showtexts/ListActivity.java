@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.mkf_test.showtexts.db.query.WebUrlTableQuery;
 import com.mkf_test.showtexts.db.table.WebUrlTable;
-import com.mkf_test.showtexts.utils.Dbutils;
 
 import java.util.List;
 

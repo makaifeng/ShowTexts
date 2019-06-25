@@ -13,16 +13,11 @@ import com.mkf_test.showtexts.entity.Route;
 
 public class CacheALLText {
     ParseHttpData cacheData;
-    Dbutils db;
 
     public CacheALLText(ParseHttpData cacheData) {
         this.cacheData = cacheData;
     }
 
-    public CacheALLText(Dbutils db, ParseHttpData data) {
-        this.cacheData = data;
-        this.db = db;
-    }
 
     public void start() {
         while (cacheData != null && cacheData.getIsCatalog() == 0) {
@@ -34,7 +29,7 @@ public class CacheALLText {
     private void cacheone() {
         BookTable bookd = null;
         try {
-            bookd = db.getDbManager().getBookTableDao().queryBuilder().where(BookTableDao.Properties.CurUrl.eq(cacheData.getNextUrl())).unique();
+            bookd = new BookTableQuery().getByUrl(cacheData.getNextUrl().getUrl());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,16 +68,16 @@ public class CacheALLText {
     }
 
     private void addToDB(ParseHttpData data, String urlPath) {
-        if (data.getIsCatalog()==0){
+        if (data.getIsCatalog() == 0) {
             try {
-                BookTable book=new BookTable();
+                BookTable book = new BookTable();
                 book.setNextUrl(data.getNextUrl().getUrl());
                 book.setPrevUrl(data.getPrevUrl().getUrl());
                 book.setCurUrl(urlPath);
                 book.setCatalogUrl(data.getCatalogUrl().getUrl());
                 book.setText(data.getText());
                 book.setTitle(data.getTitle());
-               new BookTableQuery().insert(book);
+                new BookTableQuery().insert(book);
             } catch (Exception e) {
                 e.printStackTrace();
             }

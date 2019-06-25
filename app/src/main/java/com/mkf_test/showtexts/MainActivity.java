@@ -116,17 +116,22 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        showLastUrlBtn();
+
+    }
+
+    private void showLastUrlBtn() {
         lastUrl = getSharedPreferences(getPackageName(), MODE_PRIVATE).getString("url", "");
+        if (!TextUtils.isEmpty(lastUrl)) {
+            showLastUrl.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            lastUrl = getSharedPreferences(getPackageName(), MODE_PRIVATE).getString("url", "");
-            if (!TextUtils.isEmpty(lastUrl)) {
-                showLastUrl.setVisibility(View.VISIBLE);
-            }
+            showLastUrlBtn();
         } else if (requestCode == 2 && resultCode == RESULT_OK) {
             String url = data.getStringExtra("url");
             startActivityForResult(new Intent(this, WebActivity.class).putExtra("url", url), 1);

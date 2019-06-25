@@ -30,7 +30,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import com.mkf_test.showtexts.utils.Dbutils;
+import com.mkf_test.showtexts.db.table.WebUrlTable;
 import com.mkf_test.showtexts.widget.ProgressWebView;
 
 import java.io.File;
@@ -407,7 +407,7 @@ public class WebActivity extends BaseActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.add_bookmark) {
             try {
-                Dbutils.getInstance().dbAdd(webview.getTitle(), webview.getUrl());
+                new WebUrlTable(webview.getTitle(), webview.getUrl()).saveDB();
             } catch (Exception e) {
                 e.printStackTrace();
             }
