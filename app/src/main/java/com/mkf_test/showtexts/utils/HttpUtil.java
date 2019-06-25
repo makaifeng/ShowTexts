@@ -1,9 +1,18 @@
 package com.mkf_test.showtexts.utils;
 
+import android.text.TextUtils;
+
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -21,9 +30,18 @@ public class HttpUtil {
      *
      * @return
      */
-    public static void sendHttpForBack(final String url, final String msg, final String method, String charset, final Map<String, String> headmap, final httpback httpback) {
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url(url).build();
+    public static void sendHttpForBack(final String url, final String msg, final String method, String charset, final Map<String, String> headmap, final httpBack httpback) {
+        OkHttpClient client;
+        if (url.startsWith("https://")) {
+            client = getUnsafeOkHttpClient();
+        } else {
+            client = new OkHttpClient();
+        }
+        Request.Builder builder = new Request.Builder().url(url);
+        if (!TextUtils.isEmpty(charset)){
+            builder.addHeader("Content-Type","application/x-www-form-urlencoded;charset="+charset);
+        }
+        Request request = builder.build();
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
             @Override
@@ -34,7 +52,10 @@ public class HttpUtil {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                httpback.back(response.message(), 200);
+                if (response.body() != null) {
+                    httpback.back(response.body().string()
+                            , 200);
+                }
             }
         });
 //		new Thread(new Runnable() {
@@ -73,7 +94,7 @@ public class HttpUtil {
 //						while ((i = is.read(b)) != -1) {
 //							buffer.append(new String(b, 0, i));
 //						}
-//						httpback.back(buffer.toString(), connection.getResponseCode());
+//						httpBack.back(buffer.toString(), connection.getResponseCode());
 //					} else {
 //						InputStream is = connection.getErrorStream();
 //						byte[] b = new byte[1024];
@@ -82,7 +103,7 @@ public class HttpUtil {
 //						while ((i = is.read(b)) != -1) {
 //							buffer.append(new String(b, 0, i));
 //						}
-//						httpback.back(buffer.toString(), connection.getResponseCode());
+//						httpBack.back(buffer.toString(), connection.getResponseCode());
 //					}
 //
 //				} catch (IOException e1) {
@@ -92,15 +113,15 @@ public class HttpUtil {
 //		}).start();
     }
 
-    public static void sendHttpForBack(String url, final String method, Map<String, String> headmap, httpback back) {
+    public static void sendHttpForBack(String url, final String method, Map<String, String> headmap, httpBack back) {
         sendHttpForBack(url, "", method, "utf-8", headmap, back);
     }
 
-    public static void sendHttpForBack(String url, final String method, String charset, httpback back) {
+    public static void sendHttpForBack(String url, final String method, String charset, httpBack back) {
         sendHttpForBack(url, "", method, charset, null, back);
     }
 
-    public static void sendHttpForBack(String url, String charset, httpback back) {
+    public static void sendHttpForBack(String url, String charset, httpBack back) {
         sendHttpForBack(url, "", GET, charset, null, back);
     }
 
@@ -120,7 +141,48 @@ public class HttpUtil {
         }
     }
 
-    public interface httpback {
+    //okHttp3添加信任所有证书
+    public static OkHttpClient getUnsafeOkHttpClient() {
+
+        try {
+            X509TrustManager x509TrustManager = new X509TrustManager() {
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                }
+
+                @Override
+                public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                }
+
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[]{};
+                }
+            };
+            final TrustManager[] trustAllCerts = new TrustManager[]{
+                    x509TrustManager
+            };
+
+            final SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            builder.sslSocketFactory( sslContext.getSocketFactory(),x509TrustManager);
+
+            builder.hostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+
+            return builder.build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public interface httpBack {
         void back(String data, int responseCode);
     }
 }

@@ -3,14 +3,22 @@ package com.mkf_test.showtexts;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.mkf_test.showtexts.db.GreenDaoManager;
+import com.mkf_test.showtexts.db.table.SearchColumnTable;
 import com.mkf_test.showtexts.ui.AddTagActivity;
 import com.mkf_test.showtexts.ui.ShowTextActivity2;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 
@@ -47,6 +55,8 @@ public class MainActivity extends BaseActivity {
         String url = edittext.getText().toString().trim();
         if (TextUtils.isEmpty(url)) return;
         startActivityForResult(new Intent(this, WebActivity.class).putExtra("url", url), 1);
+
+
     }
 
     public void tomyview(View v) {

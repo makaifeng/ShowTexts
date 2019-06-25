@@ -3,14 +3,24 @@ package com.mkf_test.showtexts.db.query;
 import android.util.Log;
 
 import com.mkf_test.showtexts.db.GreenDaoManager;
+import com.mkf_test.showtexts.db.table.DaoSession;
 
+import org.greenrobot.greendao.AbstractDao;
+
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by kaikai on  2019/4/12
  */
-public abstract class BaseQuery<T> implements Query<T> {
+public abstract class BaseQuery<T> implements IQuery<T> {
     public static final String TAG = BaseQuery.class.getSimpleName();
+
+    public DaoSession getDaoSession() {
+        return GreenDaoManager.getDaoSession();
+    }
 
     @Override
     public boolean insert(T model) {
@@ -95,6 +105,18 @@ public abstract class BaseQuery<T> implements Query<T> {
         }
     }
 
+    @Override
+    public List<T> findAll() {
+        Type genericSuperclass = getClass().getGenericSuperclass();
+        Type[] actualTypeArguments ;
+        if (genericSuperclass != null) {
+            actualTypeArguments = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
+        }else {
+            return new ArrayList<>();
+        }
+        AbstractDao<T, ?> dao = (AbstractDao<T, ?>) GreenDaoManager.getDaoSession().getDao((Class<? extends Object>) actualTypeArguments[0]);
+        return dao.queryBuilder().list();
+    }
 
     /**
      * 打印日志

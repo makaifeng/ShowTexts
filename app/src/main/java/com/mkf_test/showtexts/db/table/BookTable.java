@@ -9,7 +9,7 @@ import org.greenrobot.greendao.annotation.Generated;
  * Created by Administrator on 2017/5/12.
  */
 @Entity(nameInDb = "BookDB") //为表创建)
-public class BookTable {
+public class BookTable{
     @Id
     @Property(nameInDb = "id")
     private Long id;

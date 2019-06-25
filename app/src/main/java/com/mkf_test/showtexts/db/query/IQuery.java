@@ -7,7 +7,7 @@ import java.util.List;
  * 数据库 Service 层 基础接口
  */
 
-public interface Query<T extends Object> {
+public interface IQuery<T extends Object> {
     boolean insert(T model);//持久化
     boolean insert(List<T> models);//批量持久化
     void  deleteObject(T object);// 删除某个对象
@@ -22,6 +22,6 @@ public interface Query<T extends Object> {
 //    List<T> findByIds(String ids);//通过多个ID查找//eg：ids -> “1,2,3,4”
 //    List<T>  findByCondition(WhereCondition condition,Class clss);//根据条件查找
 //    List<T> findByExample(Example example);//根据条件查找
-//    List<T> findAll();//获取所有
+    List<T> findAll();//获取所有
 //    int countByExample(Example example);//根据条件取统计
 }

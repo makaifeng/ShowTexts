@@ -3,7 +3,8 @@ package com.mkf_test.showtexts.ParseHttp;
 import android.os.Handler;
 import android.os.Message;
 
-import com.mkf_test.showtexts.db.table.SeachColumn;
+import com.mkf_test.showtexts.db.query.SearchColumnTableQuery;
+import com.mkf_test.showtexts.db.table.SearchColumnTable;
 import com.mkf_test.showtexts.entity.ParseHttpData;
 import com.mkf_test.showtexts.entity.Route;
 import com.mkf_test.showtexts.utils.Dbutils;
@@ -14,7 +15,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -34,12 +34,7 @@ public class ParseHttp {
 
     public void start() {
         data = new ParseHttpData();
-        HttpUtil.sendHttpForBack(url, "gbk", new HttpUtil.httpback() {
-            @Override
-            public void back(String data, int responseCode) {
-                ParseHttpForDetails(data);
-            }
-        });
+        HttpUtil.sendHttpForBack(url, "gbk", (data, responseCode) -> ParseHttpForDetails(data));
     }
 
     /**
@@ -51,22 +46,22 @@ public class ParseHttp {
 
         if (url == null || url.length() == 0) return;
         String baseuri = url.substring(0, url.lastIndexOf("/") + 1);
-        List<SeachColumn> mSeachColumnList = Dbutils.getInstance().findAllFromSearchColumnDao();
+        List<SearchColumnTable> mSearchColumnList =new SearchColumnTableQuery().findAll();
 
         Document doc = Jsoup.parse(html);
 //            Element content = doc.getElementById("content");
         Elements links = doc.getElementsByTag("div");
         for (Element link : links) {
             link.setBaseUri(baseuri);
-            for (SeachColumn seachColumn : mSeachColumnList) {
+            for (SearchColumnTable searchColumnTable : mSearchColumnList) {
                 if (data.getText() == null || data.getText().equals("")) {
-                    if (link.id().equals(seachColumn.getContentCoulmn())) {
+                    if (link.id().equals(searchColumnTable.getContentCoulmn())) {
                         String text = link.html();
                         data.setText(text);
                     }
                 }
                 if (data.getTitle() == null || data.getTitle().equals("")) {
-                    if (link.id().equals(seachColumn.getNameColumn())) {
+                    if (link.id().equals(searchColumnTable.getNameColumn())) {
                         String text = link.html();
                         data.setTitle(text);
                     }
@@ -89,7 +84,7 @@ public class ParseHttp {
             Elements links3 = doc.getElementsByTag("h1");
             for (Element link : links3) {
                 link.setBaseUri(baseuri);
-                for (SeachColumn seachColumn : mSeachColumnList) {
+                for (SearchColumnTable seachColumn : mSearchColumnList) {
                     if (data.getTitle() == null || data.getTitle().equals("")) {
                         if (link.id().equals(seachColumn.getNameColumn())) {
                             String text = link.html();
@@ -102,7 +97,7 @@ public class ParseHttp {
         Elements links2 = doc.getElementsByTag("a");
         for (Element link : links2) {
             link.setBaseUri(baseuri);
-            for (SeachColumn seachColumn : mSeachColumnList) {
+            for (SearchColumnTable seachColumn : mSearchColumnList) {
                 if (data.getPrevUrl() == null || data.getPrevUrl().equals("")) {
                     if (link.id().equals(seachColumn.getPrevColumn())) {
                         Route r = new Route();

@@ -26,6 +26,7 @@ public class SearchColumnTable {
     @Property(nameInDb = "codingFormat")
     String codingFormat;
 
+
     @Generated(hash = 1384838773)
     public SearchColumnTable(Long id, String nameColumn, String prevColumn,
             String nextColumn, String muluColumn, String contentCoulmn,
@@ -42,6 +43,7 @@ public class SearchColumnTable {
     @Generated(hash = 44057713)
     public SearchColumnTable() {
     }
+
 
     public String getMuluColumn() {
         return muluColumn;

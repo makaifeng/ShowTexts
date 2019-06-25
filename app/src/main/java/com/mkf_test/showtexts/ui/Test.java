@@ -32,7 +32,7 @@ public class Test extends BaseActivity {
 
     private void initView() {
         String url = "http://m.xs222.com/html/3/3728/3086462.html";
-        HttpUtil.sendHttpForBack(url, "gbk", new HttpUtil.httpback() {
+        HttpUtil.sendHttpForBack(url, "gbk", new HttpUtil.httpBack() {
             @Override
             public void back(String data, int responseCode) {
                 text.setText(Html.fromHtml(data));

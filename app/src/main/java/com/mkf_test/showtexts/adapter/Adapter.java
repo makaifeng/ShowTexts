@@ -47,13 +47,13 @@ public abstract class Adapter<T> extends BaseAdapter {
 	public View getView(int position, View v, ViewGroup group) {
 		ViewHolder holder = ViewHolder.get(context, v, group, this.mlayout,
 				position);
-		getview(holder, position, this.mlist.get(position));
+		getView(holder, position, this.mlist.get(position));
 		return holder.getConvertView();
 	}
 
-	public abstract void getview(ViewHolder holder, int position, T T);
+	public abstract void getView(ViewHolder holder, int position, T T);
 
-	protected void initViewholder(View v, Object object) {
+	protected void initViewHolder(View v, Object object) {
 		Field[] arrayOfField = object.getClass().getDeclaredFields();
 		int i = arrayOfField.length;
 		int j = 0;

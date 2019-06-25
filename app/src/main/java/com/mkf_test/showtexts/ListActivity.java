@@ -13,7 +13,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.mkf_test.showtexts.db.table.WebUrl;
+import com.mkf_test.showtexts.db.query.WebUrlTableQuery;
+import com.mkf_test.showtexts.db.table.WebUrlTable;
 import com.mkf_test.showtexts.utils.Dbutils;
 
 import java.util.List;
@@ -24,7 +25,7 @@ import butterknife.BindView;
 public class ListActivity extends BaseActivity {
     @BindView(R.id.list)
     ListView listView;
-    List<WebUrl> webUrllist;
+    List<WebUrlTable> webUrlList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,9 +41,9 @@ public class ListActivity extends BaseActivity {
         setTitle("书签");
 
         try {
-            webUrllist = Dbutils.getInstance().dbGetList();
-            if (webUrllist!=null)
-            listView.setAdapter(new MyAdapter(this,webUrllist));
+            webUrlList =new WebUrlTableQuery().dbGetList();
+            if (webUrlList !=null)
+            listView.setAdapter(new MyAdapter(this, webUrlList));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,7 +69,7 @@ public class ListActivity extends BaseActivity {
                                                 break;
                                             case 1://复制网址
                                                 ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                                                cm. setPrimaryClip(ClipData.newPlainText(null, webUrllist.get(position).getUrl()));
+                                                cm. setPrimaryClip(ClipData.newPlainText(null, webUrlList.get(position).getUrl()));
                                                 break;
                                             case 2://删除
                                                 delectUrl(position);
@@ -85,16 +86,16 @@ public class ListActivity extends BaseActivity {
 
     }
     private  void openUrl(int position){
-        if (webUrllist!=null) {
-            setResult(RESULT_OK, getIntent().putExtra("url", webUrllist.get(position).getUrl()));
+        if (webUrlList !=null) {
+            setResult(RESULT_OK, getIntent().putExtra("url", webUrlList.get(position).getUrl()));
             finish();
         }
     }
     private  void delectUrl(int position){
-        if (webUrllist!=null) {
+        if (webUrlList !=null) {
             try {
-                Dbutils.getInstance().dbDelete(webUrllist.get(position));
-                webUrllist.remove(position);
+               new WebUrlTableQuery().deleteObject(webUrlList.get(position));
+                webUrlList.remove(position);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -102,8 +103,8 @@ public class ListActivity extends BaseActivity {
     }
 
     class MyAdapter extends BaseAdapter {
-        Context context; List<WebUrl> webUrllist;
-        private MyAdapter(Context context, List<WebUrl> webUrllist){
+        Context context; List<WebUrlTable> webUrllist;
+        private MyAdapter(Context context, List<WebUrlTable> webUrllist){
             this.context=context;
             this.webUrllist=webUrllist;
         }

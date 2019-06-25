@@ -25,7 +25,7 @@ android {
         }
     }
     greendao {
-        schemaVersion 2
+        schemaVersion 3
     }
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_8
@@ -52,4 +52,6 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
     // https://github.com/square/okhttp
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+
+    implementation 'com.alibaba:fastjson:1.2.48'
 }

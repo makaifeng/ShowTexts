@@ -4,8 +4,12 @@ import com.mkf_test.showtexts.ParseHttp.ParseHttp;
 import com.mkf_test.showtexts.ParseHttp.ParseHttp1;
 import com.mkf_test.showtexts.ParseHttp.ParseHttp2;
 import com.mkf_test.showtexts.ParseHttp.ParseHttp3;
+import com.mkf_test.showtexts.ParseHttp.ParseHttp5;
 import com.mkf_test.showtexts.ParseHttp.ParseHttpListener;
+import com.mkf_test.showtexts.db.query.HostColumnTableQuery;
+import com.mkf_test.showtexts.db.table.HostColumnTable;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,8 +19,15 @@ import java.util.regex.Pattern;
 
 public class ParseHttpUtils {
 
-   static ParseHttpUtils phu=new ParseHttpUtils();
     public static void ParseFromHttp(String url,ParseHttpListener listener){
+        List<HostColumnTable> all = new HostColumnTableQuery().findAll();
+        for (HostColumnTable hostColumnTable : all) {
+            if (url.startsWith(hostColumnTable.getHostName())){
+                ParseHttp5 parseHttp=new ParseHttp5(url,hostColumnTable, listener);
+                parseHttp.start();
+                return;
+            }
+        }
         if (url.startsWith("http://m.xs222.com")||url.startsWith("https://m.xs222.com")
                 ||url.startsWith("http://m.booktxt.net")||url.startsWith("https://m.booktxt.net")){
             parseHttp1( url, listener);

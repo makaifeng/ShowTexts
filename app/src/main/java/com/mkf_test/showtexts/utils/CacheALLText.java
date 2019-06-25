@@ -1,8 +1,9 @@
 package com.mkf_test.showtexts.utils;
 
 import com.mkf_test.showtexts.ParseHttp.ParseHttpListener;
-import com.mkf_test.showtexts.db.table.BookDB;
-import com.mkf_test.showtexts.db.table.BookDBDao;
+import com.mkf_test.showtexts.db.query.BookTableQuery;
+import com.mkf_test.showtexts.db.table.BookTable;
+import com.mkf_test.showtexts.db.table.BookTableDao;
 import com.mkf_test.showtexts.entity.ParseHttpData;
 import com.mkf_test.showtexts.entity.Route;
 
@@ -31,9 +32,9 @@ public class CacheALLText {
 
 
     private void cacheone() {
-        BookDB bookd = null;
+        BookTable bookd = null;
         try {
-            bookd = db.getDbManager().getBookDBDao().queryBuilder().where(BookDBDao.Properties.CurUrl.eq(cacheData.getNextUrl())).unique();
+            bookd = db.getDbManager().getBookTableDao().queryBuilder().where(BookTableDao.Properties.CurUrl.eq(cacheData.getNextUrl())).unique();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,14 +75,14 @@ public class CacheALLText {
     private void addToDB(ParseHttpData data, String urlPath) {
         if (data.getIsCatalog()==0){
             try {
-                BookDB book=new BookDB();
+                BookTable book=new BookTable();
                 book.setNextUrl(data.getNextUrl().getUrl());
                 book.setPrevUrl(data.getPrevUrl().getUrl());
                 book.setCurUrl(urlPath);
                 book.setCatalogUrl(data.getCatalogUrl().getUrl());
                 book.setText(data.getText());
                 book.setTitle(data.getTitle());
-                db.dbAdd(book);
+               new BookTableQuery().insert(book);
             } catch (Exception e) {
                 e.printStackTrace();
             }

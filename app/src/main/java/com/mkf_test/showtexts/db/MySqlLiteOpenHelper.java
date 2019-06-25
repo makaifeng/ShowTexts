@@ -3,11 +3,10 @@ package com.mkf_test.showtexts.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-
-import com.mkf_test.showtexts.db.table.BookDBDao;
+import com.mkf_test.showtexts.db.table.BookTableDao;
 import com.mkf_test.showtexts.db.table.DaoMaster;
-import com.mkf_test.showtexts.db.table.SeachColumnDao;
-import com.mkf_test.showtexts.db.table.WebUrlDao;
+import com.mkf_test.showtexts.db.table.SearchColumnTableDao;
+import com.mkf_test.showtexts.db.table.WebUrlTableDao;
 
 import org.greenrobot.greendao.database.Database;
 
@@ -28,7 +27,7 @@ public class MySqlLiteOpenHelper extends DaoMaster.DevOpenHelper {
     @Override
     public void onUpgrade(Database db, int oldVersion, int newVersion) {
         DaoMaster.createAllTables(db, true);
-        MigrationHelper.getInstance().migrate(db, BookDBDao.class, SeachColumnDao.class, WebUrlDao.class);
+        MigrationHelper.getInstance().migrate(db, BookTableDao.class, SearchColumnTableDao.class, WebUrlTableDao.class);
     }
 
 }

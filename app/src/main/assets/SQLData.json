@@ -1,0 +1,17 @@
+{"searchColumn": [{
+  "hostName": "https://m.vodtw.com/",
+  "muluColumn": "pb_mulu",
+  "prevColumn": "pb_prev",
+  "contentCoulmn": "nr1",
+  "nextColumn": "pb_next",
+  "codingFormat": "gbk",
+  "titleColumn": "nr_title"
+},{
+  "hostName": "http://m.biquge.com/",
+  "muluColumn": "pt_mulu",
+  "prevColumn": "pt_prev",
+  "contentCoulmn": "nr1",
+  "nextColumn": "pt_next",
+  "codingFormat": "gbk",
+  "titleColumn": "nr_title"
+}]}
