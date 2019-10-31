@@ -16,7 +16,6 @@ import org.jsoup.select.Elements;
 import butterknife.BindView;
 
 public class Test extends BaseActivity {
-    @BindView(R.id.text)
     TextView text;
 
     @Override
@@ -31,6 +30,7 @@ public class Test extends BaseActivity {
     }
 
     private void initView() {
+        text = findViewById(R.id.text);
         String url = "http://m.xs222.com/html/3/3728/3086462.html";
         HttpUtil.sendHttpForBack(url, "gbk", new HttpUtil.httpBack() {
             @Override

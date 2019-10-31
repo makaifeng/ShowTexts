@@ -1,4 +1,4 @@
-package com.mkf_test.showtexts.ParseHttp;
+package com.mkf_test.showtexts.parsehttp;
 
 import android.os.Handler;
 import android.os.Message;
