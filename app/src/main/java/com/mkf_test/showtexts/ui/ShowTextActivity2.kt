@@ -17,25 +17,29 @@ class ShowTextActivity2 : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setToolbarVisibility(View.GONE)
+        setTitleBarVisibility(View.GONE)
         //        setContentView(R.layout.activity_show_text2);
         //        mFlipView = (FlipView) findViewById(R.id.flip_view);
         urlPath = intent.getStringExtra("url")
-        ParseHttp(0)
+        urlPath?.let {
+            flip_view.changeStatusLoading()
+            ParseHttp(0, it)
+        }
+
 
         flip_view.setOnPageFlippedListener(object : FlipView.OnPageFlippedListener {
             override fun onPageLast(): Boolean {
-                if (data!!.nextUrl != null && data!!.nextUrl.url != null) {
-                    urlPath = data!!.nextUrl.url
-                    ParseHttp(1)
+                data?.nextUrl?.url?.let {
+                    if (it.isNotEmpty())
+                        ParseHttp(1, it)
                 }
                 return true
             }
 
             override fun onPageStart(): Boolean {
-                if (data!!.prevUrl != null && data!!.prevUrl.url != null) {
-                    urlPath = data!!.prevUrl.url
-                    ParseHttp(2)
+                data?.prevUrl?.url?.let {
+                    if (it.isNotEmpty())
+                        ParseHttp(2, it)
                 }
                 return true
             }
@@ -55,21 +59,23 @@ class ShowTextActivity2 : BaseActivity() {
         return R.layout.activity_show_text2
     }
 
-    private fun ParseHttp(i: Int) {
+    private fun ParseHttp(i: Int, urlPath: String) {
+        showProgressDialog("")
         ParseHttpUtils.ParseFromHttp(urlPath) { data ->
             if (data != null) {
                 getSharedPreferences(packageName, MODE_PRIVATE).edit().putString("url", urlPath).apply()
                 this@ShowTextActivity2.data = data
                 initViewData(i)
             }
+            hideProgressDialog()
         }
     }
 
     private fun initViewData(i: Int) {
-        if (data!!.isCatalog == 1) {
+        if (data?.isCatalog == 1) {
         } else {
-            val book = Book(if (data!!.title == null) "" else data!!.title,
-                    Html.fromHtml(if (data!!.text == null) "" else data!!.text).toString())
+            val book = Book(if (data?.title == null) "" else data?.title,
+                    Html.fromHtml(if (data?.text == null) "" else data?.text).toString())
             flip_view.setBook(book, i)
         }
     }

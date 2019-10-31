@@ -8,32 +8,26 @@ import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
+import android.widget.PopupMenu
+import android.widget.PopupMenu.OnMenuItemClickListener
 import com.mkf_test.showtexts.ui.AddTagActivity
 import com.mkf_test.showtexts.ui.ShowTextActivity2
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : BaseActivity() {
-    //    @BindView(R.id.editText)
-//    internal var edittext: EditText? = null
-//    @BindView(R.id.button2)
-//    internal var showLastUrl: Button? = null
-//    @BindView(R.id.button5)
-//    internal var showLastUrl2: Button? = null
-    private var lastUrl: String? = null
 
+class MainActivity : BaseActivity() {
+    private var lastUrl: String? = null
+    private var checkedItemId: Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //        String url="http://m.6mao.com/wapbook/4025_9559214.html";
-        //        String url="http://m.greattone.net/app/music.php?classid=13&id=666";
         val url = ""
         editText.setText(url)
         if (!TextUtils.isEmpty(lastUrl)) {
             button2.visibility = View.VISIBLE
             button5.visibility = View.VISIBLE
         }
-        //        setSupportActionBar(toolbar);
+        setNavigationMenu(true, R.menu.menu_main)
+        editText.setText("https://m.vodtw.com/wapbook-36365-18171345/")
     }
 
     override fun getLayoutResId(): Int {
@@ -91,7 +85,9 @@ class MainActivity : BaseActivity() {
 
         } else if (id == R.id.addtag) {//添加标签
             val url = editText.text.toString().trim { it <= ' ' }
-            startActivity(Intent(this, AddTagActivity::class.java).putExtra("url", url))
+            if (!TextUtils.isEmpty(url)) {
+                startActivity(Intent(this, AddTagActivity::class.java).putExtra("url", url))
+            }
             //            startActivityForResult(new Intent(this,Test.class),3);
             return true
 

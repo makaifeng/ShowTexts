@@ -4,11 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat
 import android.graphics.BitmapFactory
@@ -18,30 +16,18 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.webkit.DownloadListener
-import android.webkit.ValueCallback
-import android.webkit.WebSettings
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import android.widget.Toast
-
 import com.mkf_test.showtexts.db.table.WebUrlTable
-import com.mkf_test.showtexts.widget.ProgressWebView
-
+import kotlinx.android.synthetic.main.activity_web.*
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.lang.reflect.InvocationTargetException
-import java.lang.reflect.Method
-
-import butterknife.BindView
-import kotlinx.android.synthetic.main.activity_web.*
 
 class WebActivity : BaseActivity() {
     //    @BindView(R.id.webview)
@@ -57,7 +43,8 @@ class WebActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setNavigationShowableAndClickable(true) { finish() }
+        setNavigationBackShowed(true)
+        setNavigationMenu(true, R.menu.menu_web)
         try {
             getIntentData()
             initView()
@@ -126,25 +113,8 @@ class WebActivity : BaseActivity() {
         webview.webViewClient = webViewClient()
         webview.setDownloadListener(MyWebViewDownLoadListener())
         setWebChromeClient()
-        // if (android.os.Build.VERSION.SDK_INT >
-        // android.os.Build.VERSION_CODES.JELLY_BEAN) {
-        // webview.addJavascriptInterface(new WBBehavior(this), "myObj");
-        // }
-        // webview.setOnClickListener(lis);
     }
 
-
-    // @Override
-    // // 设置回退
-    // // 覆盖Activity类的onKeyDown(int keyCoder,KeyEvent event)方法
-    // public boolean onKeyDown(int keyCode, KeyEvent event) {
-    // if ((keyCode == KeyEvent.KEYCODE_BACK) && webview.canGoBack()) {
-    // webview.goBack(); // goBack()表示返回WebView的上一页面
-    // return true;
-    // }
-    // finish();// 结束退出程序
-    // return false;
-    // }
 
     // Web视图
     private inner class webViewClient : WebViewClient() {
@@ -166,24 +136,6 @@ class WebActivity : BaseActivity() {
             }
         }
 
-        override fun onPageStarted(view: WebView, url: String, favicon: Bitmap) {
-            // if (url.startsWith("ttm://ActivityServiceList?id=310001")) {
-            // if (isFristIntent) {// 存在调用2次次方法，用这个区分是否已经跳转
-            // // Intent intent = new Intent(H5Activity.this,
-            // // SubjectActivity.class);
-            // // startActivity(intent);
-            // isFristIntent=false;
-            // // if (hasOneYuan==1) {
-            // startActivity(new Intent(context, SubjectActivity.class));
-            // // } else {
-            // // setResult(MyResultCode.H5);
-            // // }
-            // finish();
-            // }
-            // } else {
-            super.onPageStarted(view, url, favicon)
-            // }
-        }
 
         override fun onPageFinished(view: WebView, url: String) {
             if (!webview.settings.loadsImagesAutomatically) {
@@ -193,50 +145,12 @@ class WebActivity : BaseActivity() {
             getSharedPreferences(packageName, Context.MODE_PRIVATE).edit().putString("url", webview.url).commit()
             super.onPageFinished(view, url)
         }
-        //        @Override
-        //        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-        //               try {
-        //        if (url.endsWith("icon.png")) {
-        //            InputStream is = appRm.getInputStream(R.drawable.icon);
-        //            WebResourceResponse response = new WebResourceResponse("image/png",
-        //                    "utf-8", is);
-        //            return response;
-        //        } else if (url.endsWith("jquery.min.js")) {
-        //            InputStream is = appRm.getInputStream(R.raw.jquery_min_js);
-        //            WebResourceResponse response = new WebResourceResponse("text/javascript",
-        //                    "utf-8", is);
-        //            return response;
-        //        }
-        //    } catch (IOException e) {
-        //        e.printStackTrace();
-        //    }
-        //    return super.shouldInterceptRequest(view, url);
-        //        }
 
-        //        @Override
-        //        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-        //            try {
-        //                if (request.getUrl().toString().endsWith("icon.png")) {
-        //                    InputStream is = appRm.getInputStream(R.drawable.icon);
-        //                    WebResourceResponse response = new WebResourceResponse("image/png",
-        //                            "utf-8", is);
-        //                    return response;
-        //                } else if (request.getUrl().toString().endsWith("jquery.min.js")) {
-        //                    InputStream is = appRm.getInputStream(R.raw.jquery_min_js);
-        //                    WebResourceResponse response = new WebResourceResponse("text/javascript",
-        //                            "utf-8", is);
-        //                    return response;
-        //                }
-        //            } catch (IOException e) {
-        //                e.printStackTrace();
-        //            }
-        //            return super.shouldInterceptRequest(view, request);
-        //        }
     }
 
     override fun onPause() {
         if (webview != null) {
-            webview.onResume()
+            webview.onPause()
         }
         super.onPause()
     }
@@ -252,8 +166,6 @@ class WebActivity : BaseActivity() {
                 t.show()
                 return
             }
-            //            DownloaderTask task=new DownloaderTask();
-            //            task.execute(url);
         }
 
     }

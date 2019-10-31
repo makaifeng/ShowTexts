@@ -11,8 +11,16 @@ public class PageText {
     private   boolean isLastPage=false;//最后一页
     private   boolean isFristPage=false;//第一页
     private  int pagecurIndex; //当前读取的段落的索引
+    private int pageIndex;//当前页数
     private List<String> textLines = new ArrayList<>();
 
+    public int getPageIndex() {
+        return pageIndex;
+    }
+
+    public void setPageIndex(int pageIndex) {
+        this.pageIndex = pageIndex;
+    }
 
     public boolean isFristPage() {
         return isFristPage;

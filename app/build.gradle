@@ -8,8 +8,8 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.mkf_test.showtexts"
-        minSdkVersion 14
-        targetSdkVersion 28
+        minSdkVersion 19
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         signingConfig signingConfigs.debug
@@ -54,9 +54,6 @@ dependencies {
     //https://github.com/greenrobot/greenDAO
     implementation 'org.greenrobot:greendao:3.2.2'
 
-    /** ButterKnife  */
-    implementation 'com.jakewharton:butterknife:10.1.0'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
     // https://github.com/square/okhttp
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 

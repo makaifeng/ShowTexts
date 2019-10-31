@@ -14,15 +14,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
-import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
-import android.widget.ListView
 import android.widget.RelativeLayout
-import android.widget.ScrollView
 import android.widget.TextView
-
 import androidx.fragment.app.FragmentActivity
-
 import com.mkf_test.showtexts.adapter.Adapter
 import com.mkf_test.showtexts.adapter.ViewHolder
 import com.mkf_test.showtexts.db.query.BookTableQuery
@@ -32,10 +27,6 @@ import com.mkf_test.showtexts.entity.ParseHttpData
 import com.mkf_test.showtexts.entity.Route
 import com.mkf_test.showtexts.utils.DisplayUtil
 import com.mkf_test.showtexts.utils.ParseHttpUtils
-
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.OnClick
 import kotlinx.android.synthetic.main.activity_show_text.*
 
 
@@ -80,6 +71,11 @@ class ShowTextActivity : FragmentActivity() {
 
     internal var lis: View.OnClickListener = View.OnClickListener { v ->
         when (v.id) {
+            R.id.tv_prev -> clickPrev()
+            R.id.tv_next -> clickNext()
+            R.id.tv_catalog -> clickCatalog()
+            R.id.tv_lessen -> clickLessenSize()
+            R.id.tv_add -> clickAddSize()
             R.id.text -> {
                 if (data != null && data?.isCatalog == 0) {
                     if (bottomView?.visibility == View.VISIBLE)
@@ -102,7 +98,6 @@ class ShowTextActivity : FragmentActivity() {
         windowManager.defaultDisplay.getMetrics(dm)
         //窗口的宽度
         screenWidth = dm.widthPixels
-        ButterKnife.bind(this)
         getIntentData()
         initView()
     }
@@ -134,6 +129,11 @@ class ShowTextActivity : FragmentActivity() {
         }
 
         text.setOnClickListener(lis)
+        tv_prev.setOnClickListener(lis)
+        tv_next.setOnClickListener(lis)
+        tv_catalog.setOnClickListener(lis)
+        tv_lessen.setOnClickListener(lis)
+        tv_add.setOnClickListener(lis)
         initData()
     }
 
@@ -196,24 +196,6 @@ class ShowTextActivity : FragmentActivity() {
             e.printStackTrace()
         }
 
-    }
-
-    /**
-     * 单击上一章
-     *
-     * @param v View
-     */
-    @OnClick(R.id.tv_prev, R.id.tv_next, R.id.tv_catalog, R.id.tv_lessen, R.id.tv_add)
-    fun clickView(v: View) {
-        when (v.id) {
-            R.id.tv_prev -> clickPrev()
-            R.id.tv_next -> clickNext()
-            R.id.tv_catalog -> clickCatalog()
-            R.id.tv_lessen -> clickLessenSize()
-            R.id.tv_add -> clickAddSize()
-            else -> {
-            }
-        }
     }
 
     /**

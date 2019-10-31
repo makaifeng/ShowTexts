@@ -25,6 +25,27 @@ import com.mkf_test.showtexts.utils.BookPageFactory;
 
 public class FlipView extends View {
     private final String TAG = "FlipView";
+    /**
+     * 默认
+     */
+    public static final int STATUS_DEFAULT = 0;
+    /**
+     * 拖动
+     */
+    public static final int STATUS_MOVE = 1;
+    /**
+     * 自动滑动
+     */
+    public static final int STATUS_SLIDE = 2;
+    /**
+     * 滑动结束
+     */
+    public static final int STATUS_END = 3;
+    /**
+     * 数据加载中
+     */
+    public static final int STATUS_LOAD = 4;
+
     private int mViewWidth, mViewHeight;// 控件宽高
     float mDiagonalLength;//对角线长度
     //触摸点
@@ -39,9 +60,7 @@ public class FlipView extends View {
     private Slide mSlide;
     private float mSlideSpeedLeft;// 滑动速度
     private float mSlideSpeedRight;
-    private boolean isSlide;// 是否滑动
-    private boolean isDrawOnMove; //开始重绘了
-    private boolean isInitText; //是否重新加载文字
+    private int status = STATUS_DEFAULT;
     private OnPageFlippedListener mListener;
     private SlideHandler mSlideHandler; // 滑动处理Handler
     private boolean isFlipNext;//翻页时翻前一页还是后一页
@@ -51,10 +70,11 @@ public class FlipView extends View {
     PageText prePage = new PageText();
     PageText curPage = new PageText();
     PageText nextPage = new PageText();
+
     String title = "";
     private BookPageFactory mBookPageFactory;
     private Typeface typeface = Typeface.DEFAULT;//字体
-    private int bgColor = 0xffe7dcbe;       //背景颜色
+    private int bgColor = Color.WHITE;       //背景颜色 0xffe7dcbe;
     private int textColor = 0x8A000000;    //字体颜色
     private float mTextSize;            //字体大小
 
@@ -63,10 +83,9 @@ public class FlipView extends View {
 //        this.pagetext = pagetext;
 //    }
     public void setBook(Book book, int i) {
-        isInitText = false;
+        status = STATUS_DEFAULT;
         if (i == 0) {
             //加载初始数据
-
             mBookPageFactory.setBook(book);
             curPage = mBookPageFactory.getNextPageText(null);
             nextPage = mBookPageFactory.getNextPageText(curPage);
@@ -74,8 +93,8 @@ public class FlipView extends View {
         } else if (i == 1) {  //加载下一章
             mBookPageFactory.setBook(book);
             prePage = curPage;
-            curPage = nextPage;
-            nextPage = mBookPageFactory.getNextPageText(nextPage);
+            curPage = mBookPageFactory.getNextPageText(null);
+            nextPage = mBookPageFactory.getNextPageText(curPage);
             startLeftSile();
         } else if (i == 2) {//加载上一章
             mBookPageFactory.setBook(book);
@@ -156,7 +175,7 @@ public class FlipView extends View {
         titlePaint.setTextSize(titleSize);
         titlePaint.setTypeface(typeface);
         bgPaint = new Paint();
-        bgPaint.setColor(Color.WHITE);
+        bgPaint.setColor(bgColor);
         mTouch = new PointF();
         mLastDownPoint = new PointF();
         mAutoSlideStart = new PointF();
@@ -170,7 +189,7 @@ public class FlipView extends View {
                 GradientDrawable.Orientation.LEFT_RIGHT, color);
         mFoldShadowLR.setGradientType(GradientDrawable.LINEAR_GRADIENT);
 
-        mBookPageFactory = new BookPageFactory(getContext());
+        mBookPageFactory = new BookPageFactory(getContext(), mViewWidth, mViewHeight);
         mBookPageFactory.setTextPaint(textPaint);
     }
 
@@ -179,6 +198,7 @@ public class FlipView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         mViewWidth = w;
         mViewHeight = h;
+        mBookPageFactory.changeViewSize(mViewWidth, mViewHeight);
         initDatas();
     }
 
@@ -186,8 +206,8 @@ public class FlipView extends View {
         //控件对角线长度
         mDiagonalLength = (float) Math.hypot(mViewWidth, mViewHeight);
         //滑动速度
-        mSlideSpeedLeft = mViewWidth / 25f;
-        mSlideSpeedRight = mViewWidth / 25f;
+        mSlideSpeedLeft = mViewWidth / 15f;
+        mSlideSpeedRight = mViewWidth / 15f;
     }
 
 
@@ -199,7 +219,7 @@ public class FlipView extends View {
             drawText(canvas);
             return;
         }
-        if (isDrawOnMove || isSlide) {
+        if (status == STATUS_MOVE || status == STATUS_SLIDE) {
             //覆盖翻页
             flipCover(canvas);
         } else {
@@ -212,9 +232,9 @@ public class FlipView extends View {
             return;
         }
         //绘制下层page
-        canvas.save();
+
         drawbgText(canvas, curPage);
-        canvas.restore();
+
 
         if (isFlipNext) {   //向后翻
             if (curPage.isLastPage()) {
@@ -224,9 +244,9 @@ public class FlipView extends View {
             //绘制上层page
             float moveDis = mLastDownPoint.x - mTouch.x;
             if (moveDis < 0) moveDis = 0;
-            canvas.save();
+
             drawFlipText(canvas, -moveDis, prePage, textPaint);
-            canvas.restore();
+
 
             //阴影
             int left = (int) (mViewWidth - moveDis) - 1;
@@ -261,9 +281,9 @@ public class FlipView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (isSlide)
+        if (status == STATUS_SLIDE)
             return true;   //自动滑动过程中不响应touch事件
-        if (isInitText)
+        if (status == STATUS_LOAD)
             return true;   //加载数据中不响应touch事件
         mTouch.x = event.getX();
         mTouch.y = event.getY();
@@ -273,15 +293,17 @@ public class FlipView extends View {
                 mLastDownPoint.set(mTouch);//保存下手指落下时刻的触摸点
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (!isDrawOnMove) {
+                if (status != STATUS_MOVE) {
                     //翻前一页
                     if (mTouch.x - mLastDownPoint.x > width) {
                         Log.e(TAG, "onTouchEvent: pagePre");
                         isFlipNext = false;
                         if (curPage.isFristPage()) {
-                            isDrawOnMove = false;
-                            if (mListener != null)
-                                isInitText = mListener.onPageStart();
+                            status = STATUS_DEFAULT;
+                            if (mListener != null) {
+                                changeStatusLoading();
+                                mListener.onPageStart();
+                            }
                             Log.e(TAG, "onTouchEvent: mListener.onPageStart()");
 //                            Toast.makeText(mContext, "已经是第一页了", Toast.LENGTH_SHORT).show();
                             return true;
@@ -290,7 +312,7 @@ public class FlipView extends View {
                         curPage = prePage;
                         prePage = mBookPageFactory.getPrePageText(prePage);
                         Log.e(TAG, "onTouchEvent: isDrawOnMove=true");
-                        isDrawOnMove = true;
+                        status = STATUS_MOVE;
                     }
                     //翻下一页
                     if (mTouch.x - mLastDownPoint.x < -width) {
@@ -298,9 +320,11 @@ public class FlipView extends View {
                         isFlipNext = true;
                         Log.e(TAG, "onTouchEvent: PagecurIndex=" + curPage.getPagecurIndex());
                         if (curPage.isLastPage()) {
-                            isDrawOnMove = false;
-                            if (mListener != null)
-                                isInitText = mListener.onPageLast();
+                            status = STATUS_DEFAULT;
+                            if (mListener != null) {
+                                changeStatusLoading();
+                                mListener.onPageLast();
+                            }
                             Log.e(TAG, "onTouchEvent: mListener.onPageLast()");
 //                            Toast.makeText(mContext, "已经是最后一页了", Toast.LENGTH_SHORT).show();
                             return true;
@@ -308,7 +332,7 @@ public class FlipView extends View {
                         prePage = curPage;
                         curPage = nextPage;
                         nextPage = mBookPageFactory.getNextPageText(nextPage);
-                        isDrawOnMove = true;
+                        status = STATUS_MOVE;
                     }
 //                    Log.e(TAG, "onTouchEvent: isFlipNext="+isFlipNext );
 //                    Log.e(TAG, "onTouchEvent: isDrawOnMove="+isDrawOnMove );
@@ -327,12 +351,13 @@ public class FlipView extends View {
                     //点击右半边 下一页
                     if (mTouch.x > mViewWidth * 2 / 3) {
                         if (curPage.isLastPage()) {
-                            if (mListener != null) isInitText = mListener.onPageLast();
+                            if (mListener != null) {
+                                changeStatusLoading();
+                                mListener.onPageLast();
+                            }
                             return true;
                         }
-                        prePage = curPage;
-                        curPage = nextPage;
-                        nextPage = mBookPageFactory.getNextPageText(nextPage);
+
                         isFlipNext = true;
                         Log.e(TAG, "onTouchEvent: onclickright PagecurIndex=" + curPage.getPagecurIndex());
                         //执行动画，跳到下一页
@@ -341,12 +366,12 @@ public class FlipView extends View {
                         //点击左半边 上一页
                         if (mTouch.x < mViewWidth / 3) {
                             if (curPage.isFristPage()) {
-                                if (mListener != null) isInitText = mListener.onPageStart();
+                                if (mListener != null) {
+                                    changeStatusLoading();
+                                    mListener.onPageStart();
+                                }
                                 return true;
                             }
-                            nextPage = curPage;
-                            curPage = prePage;
-                            prePage = mBookPageFactory.getPrePageText(prePage);
                             isFlipNext = false;
                             Log.e(TAG, "onTouchEvent: onclickleft PagecurIndex=" + curPage.getPagecurIndex());
                             //执行动画，跳到上一页
@@ -361,7 +386,7 @@ public class FlipView extends View {
 //                if (!isDrawOnMove) {
 //                    return true;
 //                }
-                isDrawOnMove = false;
+                status = STATUS_DEFAULT;
                 //翻前一页
                 if (mTouch.x - mLastDownPoint.x > width) {
                     if (nextPage.isFristPage()) {
@@ -428,8 +453,7 @@ public class FlipView extends View {
         mAutoSlideStart.x = x;
         mAutoSlideStart.y = y;
         // 开始滑动
-        isSlide = true;
-
+        status = STATUS_SLIDE;
         // 滑动
         slide();
     }
@@ -438,22 +462,19 @@ public class FlipView extends View {
         //前一页已经向左完全翻完
         if (mSlide == Slide.LEFT && mTouch.x <= -(mViewWidth)) {
             Log.e(TAG, "slide: slideleftend");
-            isDrawOnMove = false;
-            isSlide = false;
-
+            status = STATUS_END;
         }
 
         //下一页已经向右完全翻完
         if (mSlide == Slide.RIGHT && mTouch.x >= mViewWidth) {
             Log.e(TAG, "slide: sliderightend");
-            isDrawOnMove = false;
-            isSlide = false;
+            status = STATUS_END;
         }
 
         //往左边滑
         if (mSlide == Slide.LEFT && mTouch.x > -(mViewWidth)) {
             Log.e(TAG, "slide: slideleft");
-            if (isSlide) {
+            if (status == STATUS_SLIDE) {
                 mTouch.x -= mSlideSpeedLeft;
                 mSlideHandler.sleep(25);
             }
@@ -462,7 +483,7 @@ public class FlipView extends View {
         //往右边滑
         if (mSlide == Slide.RIGHT && mTouch.x < mViewWidth) {
             Log.e(TAG, "slide: slideright");
-            if (isSlide) {
+            if (status == STATUS_SLIDE) {
                 mTouch.x += mSlideSpeedRight;
                 mSlideHandler.sleep(25);
             }
@@ -472,10 +493,15 @@ public class FlipView extends View {
     private void drawText(Canvas canvas) {
         float y = mTextSize + mBookPageFactory.getMarginHeight() / 2;
         float x = mBookPageFactory.getMarginWidth() / 2;
-        //标题
+
         canvas.save();
-        canvas.drawText(mBookPageFactory.getTitle(), x, y, titlePaint);
+        canvas.drawRect(0, 0f, getWidth(), getHeight() + 0f, bgPaint);
         canvas.restore();
+
+        drawTitle(canvas, x, y);
+        drawPageCode(canvas, x, y);
+
+        canvas.save();
         y += mBookPageFactory.getLineHeight();
         if (curPage != null) {
             for (int i = 0; i < curPage.getTextLines().size(); i++) {
@@ -483,31 +509,79 @@ public class FlipView extends View {
                 y += mBookPageFactory.getLineHeight();
             }
         }
-    }
-
-    private void drawbgText(Canvas canvas, PageText pt) {
-        float y = mTextSize + mBookPageFactory.getMarginHeight() / 2;
-        float x = mBookPageFactory.getMarginWidth() / 2;
-        //标题
-        canvas.save();
-        canvas.drawText(mBookPageFactory.getTitle(), x, y, titlePaint);
         canvas.restore();
-        y += mBookPageFactory.getLineHeight();
-        if (pt != null) {
-            for (int i = 0; i < pt.getTextLines().size(); i++) {
-                canvas.drawText(pt.getTextLines().get(i), x, y, textPaint);
-                y += mBookPageFactory.getLineHeight();
+
+        if (status == STATUS_END) {
+            if (mSlide == Slide.LEFT && !isFlipNext) {
+                prePage = curPage;
+                curPage = nextPage;
+                nextPage = mBookPageFactory.getNextPageText(nextPage);
+            } else if (mSlide == Slide.RIGHT && isFlipNext) {
+                nextPage = curPage;
+                curPage = prePage;
+                prePage = mBookPageFactory.getPrePageText(prePage);
             }
         }
     }
 
-    private void drawFlipText(Canvas canvas, float x, PageText pt, Paint paint) {
-        canvas.drawRect(x, 0f, x + getWidth(), getHeight() + 0f, bgPaint);
-        float y = mTextSize + mBookPageFactory.getMarginHeight() / 2;
+    private void drawbgText(Canvas canvas, PageText pt) {
+        float startY = mTextSize + mBookPageFactory.getMarginHeight() / 2;
+        float startX = mBookPageFactory.getMarginWidth() / 2;
+//        canvas.save();
+//        canvas.drawRect(0f, 0f, getWidth(), getHeight() + 0f, bgPaint);
+//        canvas.restore();
+
+        drawTitle(canvas, startX, startY);
+        drawPageCode(canvas, startX, startY);
+
+        canvas.save();
+        float y = startY;
+        if (pt != null) {
+            for (int i = 0; i < pt.getTextLines().size(); i++) {
+                y += mBookPageFactory.getLineHeight();
+                canvas.drawText(pt.getTextLines().get(i), startX, y, textPaint);
+            }
+        }
+        canvas.restore();
+    }
+
+    /**
+     * 绘制页码
+     *
+     * @param canvas
+     */
+    private void drawPageCode(Canvas canvas, float startX, float startY) {
+        //页码
+        String page = curPage.getPageIndex() + "/" + mBookPageFactory.getTotalPage();
+        float tWidth = titlePaint.measureText(page);
+        float marginX = mBookPageFactory.getMarginWidth() / 2;
+        canvas.save();
+        canvas.drawText(page, startX + mViewWidth - tWidth - marginX * 2, startY, titlePaint);
+        canvas.restore();
+    }
+
+    /**
+     * 绘制标题
+     *
+     * @param canvas
+     */
+    private void drawTitle(Canvas canvas, float startX, float startY) {
         //标题
         canvas.save();
-        canvas.drawText(mBookPageFactory.getTitle(), x, y, titlePaint);
+        canvas.drawText(mBookPageFactory.getTitle(), startX, startY, titlePaint);
         canvas.restore();
+    }
+
+
+    private void drawFlipText(Canvas canvas, float x, PageText pt, Paint paint) {
+        float y = mTextSize + mBookPageFactory.getMarginHeight() / 2;
+        canvas.save();
+        canvas.drawRect(0f, 0f, getWidth(), getHeight(), bgPaint);
+        canvas.restore();
+
+        drawTitle(canvas, x, y);
+        drawPageCode(canvas, x, y);
+
         y += mBookPageFactory.getLineHeight();
         if (paint == null) {
             paint = textPaint;
@@ -520,4 +594,7 @@ public class FlipView extends View {
         }
     }
 
+    public void changeStatusLoading() {
+        status = STATUS_LOAD;
+    }
 }

@@ -1,11 +1,10 @@
 package com.mkf_test.showtexts.utils;
 
-import com.mkf_test.showtexts.ParseHttp.ParseHttpListener;
 import com.mkf_test.showtexts.db.query.BookTableQuery;
 import com.mkf_test.showtexts.db.table.BookTable;
-import com.mkf_test.showtexts.db.table.BookTableDao;
 import com.mkf_test.showtexts.entity.ParseHttpData;
 import com.mkf_test.showtexts.entity.Route;
+import com.mkf_test.showtexts.parsehttp.ParseHttpListener;
 
 /**
  * Created by Administrator on 2017/5/16.

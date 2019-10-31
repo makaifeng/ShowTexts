@@ -1,6 +1,11 @@
 package com.mkf_test.showtexts.utils;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
@@ -24,13 +29,12 @@ public class HttpUtil {
     public static final String POST = "POST";
     public static final String GET = "GET";
 
-
     /**
      * 发送网络请求
      *
      * @return
      */
-    public static void sendHttpForBack(final String url, final String msg, final String method, String charset, final Map<String, String> headmap, final httpBack httpback) {
+    public static void sendHttpForBack(final String url, final String msg, final String method, String charset, final Map<String, String> headmap, final @NonNull httpBack httpback) {
         OkHttpClient client;
         if (url.startsWith("https://")) {
             client = getUnsafeOkHttpClient();
@@ -38,8 +42,8 @@ public class HttpUtil {
             client = new OkHttpClient();
         }
         Request.Builder builder = new Request.Builder().url(url);
-        if (!TextUtils.isEmpty(charset)){
-            builder.addHeader("Content-Type","application/x-www-form-urlencoded;charset="+charset);
+        if (!TextUtils.isEmpty(charset)) {
+            builder.addHeader("Content-Type", "application/x-www-form-urlencoded;charset=" + charset);
         }
         Request request = builder.build();
         Call call = client.newCall(request);
@@ -47,6 +51,7 @@ public class HttpUtil {
             @Override
             public void onFailure(Call call, IOException e) {
 //				Toast.makeText(x.app(), e.getMessage(), Toast.LENGTH_LONG).show();
+                httpback.back("请求接口失败", 400);
                 e.printStackTrace();
             }
 
@@ -55,6 +60,7 @@ public class HttpUtil {
                 if (response.body() != null) {
                     httpback.back(response.body().string()
                             , 200);
+
                 }
             }
         });
@@ -166,7 +172,7 @@ public class HttpUtil {
             final SSLContext sslContext = SSLContext.getInstance("SSL");
             sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.sslSocketFactory( sslContext.getSocketFactory(),x509TrustManager);
+            builder.sslSocketFactory(sslContext.getSocketFactory(), x509TrustManager);
 
             builder.hostnameVerifier(new HostnameVerifier() {
                 @Override

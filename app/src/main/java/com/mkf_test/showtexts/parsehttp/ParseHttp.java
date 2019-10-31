@@ -33,7 +33,7 @@ public class ParseHttp {
 
     public void start() {
         data = new ParseHttpData();
-        HttpUtil.sendHttpForBack(url, "gbk", (data, responseCode) -> ParseHttpForDetails(data));
+        HttpUtil.sendHttpForBack(url, null, (data, responseCode) -> ParseHttpForDetails(data));
     }
 
     /**
